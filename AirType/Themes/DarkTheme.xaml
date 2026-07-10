@@ -1,0 +1,95 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:media="clr-namespace:System.Windows.Media.Imaging;assembly=PresentationCore">
+    
+    <!-- Dark Theme Colors - Slate Graphite Dark Theme -->
+    <media:BitmapImage x:Key="AppLogoImage" UriSource="pack://application:,,,/AirType;component/Assets/Logo/airtype-logo-dark.png"/>
+
+    <SolidColorBrush x:Key="BgBrush" Color="#131313"/>
+    <SolidColorBrush x:Key="BgPanelBrush" Color="#1F1F1F"/>
+    <SolidColorBrush x:Key="BgMutedBrush" Color="#252525"/>
+    <SolidColorBrush x:Key="SurfaceAltBrush" Color="#1F1F1F"/>
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TextStrongBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#B5B5B5"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#A0A0A0"/>
+    <SolidColorBrush x:Key="PlaceholderBrush" Color="#A0A0A0"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#333333"/>
+    <SolidColorBrush x:Key="BorderStrongBrush" Color="#3C3C3C"/>
+    <SolidColorBrush x:Key="FocusRingBrush" Color="#8A8A8A"/>
+    <SolidColorBrush x:Key="DividerBrush" Color="#333333"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#7C8CFF"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#A9B3FF"/>
+    <SolidColorBrush x:Key="AccentSubtleBrush" Color="#7C8CFF" Opacity="0.18"/>
+    <SolidColorBrush x:Key="NavSelectedBrush" Color="#FFFFFF" Opacity="0.10"/>
+    <SolidColorBrush x:Key="NavActiveBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="LogoMarkBackgroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="LogoMarkForegroundBrush" Color="#1F1F1F"/>
+    <SolidColorBrush x:Key="TimelineDotBrush" Color="#7C8CFF"/>
+    <SolidColorBrush x:Key="ChartAccentBrush" Color="#7C8CFF"/>
+    <SolidColorBrush x:Key="LatencyBarBrush" Color="#7C8CFF"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="#81C784"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="#F9A825"/>
+    <SolidColorBrush x:Key="ErrorBrush" Color="#EF5350"/>
+    <SolidColorBrush x:Key="ErrorSubtleBrush" Color="#EF5350" Opacity="0.16"/>
+    <SolidColorBrush x:Key="SuccessSubtleBrush" Color="#81C784" Opacity="0.14"/>
+    <SolidColorBrush x:Key="HeroPanelBrush" Color="#252525"/>
+    <SolidColorBrush x:Key="HeroTextBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="HeroMutedBrush" Color="#A89E8F"/>
+    <SolidColorBrush x:Key="HeroDividerBrush" Color="#38322B"/>
+    
+    <!-- Dimensions (same as light theme) -->
+    <sys:Double x:Key="TopNavHeight" xmlns:sys="clr-namespace:System;assembly=mscorlib">48</sys:Double>
+    <sys:Double x:Key="SidebarExpandedWidth" xmlns:sys="clr-namespace:System;assembly=mscorlib">220</sys:Double>
+    <sys:Double x:Key="SidebarCollapsedWidth" xmlns:sys="clr-namespace:System;assembly=mscorlib">64</sys:Double>
+    <GridLength x:Key="WindowFooterHeight">14</GridLength>
+    
+    <!-- Corner Radius -->
+    <CornerRadius x:Key="ButtonCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="PanelCornerRadius">14</CornerRadius>
+    <CornerRadius x:Key="FieldCornerRadius">10</CornerRadius>
+    <CornerRadius x:Key="SelectCornerRadius">10</CornerRadius>
+    <CornerRadius x:Key="WaveCornerRadius">999</CornerRadius>
+    <CornerRadius x:Key="AppIconCornerRadius">7</CornerRadius>
+    <CornerRadius x:Key="PillCornerRadius">999</CornerRadius>
+    <CornerRadius x:Key="ModalCornerRadius">14</CornerRadius>
+    
+    <!-- Spacing -->
+    <Thickness x:Key="PagePadding">32,28,32,24</Thickness>
+    <Thickness x:Key="CardPadding">18,15</Thickness>
+
+    <!-- Modal -->
+    <SolidColorBrush x:Key="ModalBackgroundBrush" Color="#000000" Opacity="0.7"/>
+
+    <!-- Streak fire treatment -->
+    <LinearGradientBrush x:Key="StreakFireBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#FFF7ED" Offset="0"/>
+        <GradientStop Color="#FFEDD5" Offset="0.28"/>
+        <GradientStop Color="#FED7AA" Offset="0.58"/>
+        <GradientStop Color="#F97316" Offset="0.82"/>
+        <GradientStop Color="#9A3412" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Shadows (darker for dark theme) -->
+    <DropShadowEffect x:Key="PanelShadow"
+                      Color="#000000"
+                      Opacity="0.36"
+                      BlurRadius="28"
+                      ShadowDepth="10"
+                      Direction="270"/>
+
+    <!-- Modal Shadow (65% for dark theme - deeper contrast, centered for even depth) -->
+    <DropShadowEffect x:Key="ModalShadow"
+                      Color="#000000"
+                      Opacity="0.65"
+                      BlurRadius="36"
+                      ShadowDepth="0"
+                      Direction="270"/>
+
+    <!-- Elevation System -->
+    <DropShadowEffect x:Key="Elevation1" Color="#000000" Opacity="0.24" BlurRadius="10" ShadowDepth="2" Direction="270"/>
+    <DropShadowEffect x:Key="Elevation2" Color="#000000" Opacity="0.34" BlurRadius="18" ShadowDepth="5" Direction="270"/>
+    <DropShadowEffect x:Key="WindowShadow" Color="#000000" Opacity="0.70" BlurRadius="40" ShadowDepth="0" Direction="270"/>
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#333333"/>
+
+</ResourceDictionary>

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComboBox Redesign - Mockup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #FFFFFF;
+            --bg-panel: #F0F0F0;
+            --bg-muted: #E8E8E8;
+            --text-primary: #141414;
+            --text-secondary: #5D5D5D;
+            --text-muted: #9C9C9C;
+            --border: #D0D0D0;
+            --accent: #4A63FF;
+            --field-radius: 14px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-panel);
+            color: var(--text-primary);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+
+        .panel {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 32px;
+        }
+
+        .panel-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .field-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        /* ─── CURRENT (Before) ─── */
+        .current-combo {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 14px 14px 0 0;
+            padding: 10.4px 13.6px;
+            font-size: 15px;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--text-primary);
+            cursor: pointer;
+        }
+
+        .current-combo .chevron {
+            font-size: 12px;
+            color: var(--text-primary);
+        }
+
+        .current-dropdown {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .current-item {
+            padding: 10.4px 13.6px;
+            font-size: 15px;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .current-item:hover {
+            background: var(--bg-muted);
+        }
+
+        .current-item.selected {
+            background: var(--text-primary);
+            color: var(--bg);
+            font-weight: 600;
+        }
+
+        /* ─── REDESIGNED (After) ─── */
+        .new-combo {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 10px 14px;
+            font-size: 15px;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+
+        .new-combo:hover {
+            border-color: var(--text-secondary);
+        }
+
+        .new-combo.open {
+            border-color: var(--text-primary);
+            border-radius: 14px 14px 0 0;
+        }
+
+        .new-combo .chevron {
+            font-size: 11px;
+            color: var(--text-muted);
+            transition: transform 0.2s ease;
+        }
+
+        .new-combo.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .new-dropdown {
+            background: var(--bg);
+            border: 1px solid var(--text-primary);
+            border-top: none;
+            border-radius: 0 0 14px 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+            overflow: hidden;
+        }
+
+        .new-item {
+            padding: 10px 14px;
+            font-size: 15px;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.12s;
+        }
+
+        .new-item:hover {
+            background: var(--bg-muted);
+        }
+
+        .new-item.selected {
+            background: var(--text-primary);
+            color: var(--bg);
+            font-weight: 600;
+        }
+
+        .new-item .check {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .new-item .check svg {
+            opacity: 0;
+        }
+
+        .new-item.selected .check svg {
+            opacity: 1;
+        }
+
+        .new-item:last-child {
+            border-radius: 0 0 14px 14px;
+        }
+
+        /* ─── Closed state comparison ─── */
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .section-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .states-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+
+        .state-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 24px;
+        }
+
+        .state-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* ─── Closed (new) states ─── */
+        .new-combo-idle {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 10px 14px;
+            font-size: 15px;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .new-combo-hover {
+            background: var(--bg);
+            border: 1px solid var(--text-secondary);
+            border-radius: 14px;
+            padding: 10px 14px;
+            font-size: 15px;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .new-combo-focus {
+            background: var(--bg);
+            border: 1px solid var(--text-primary);
+            border-radius: 14px;
+            padding: 10px 14px;
+            font-size: 15px;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chevron-muted {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ─── Improvements list ─── */
+        .improvements {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 32px;
+        }
+
+        .improvements h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .improvement-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .improvement-item .tag {
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            height: fit-content;
+            margin-top: 2px;
+        }
+
+        .tag-visual { background: rgba(74, 99, 255, 0.1); color: var(--accent); }
+        .tag-ux { background: rgba(46, 125, 50, 0.1); color: #2E7D32; }
+        .tag-polish { background: rgba(249, 168, 37, 0.1); color: #C68A00; }
+
+        /* ─── Scrollable dropdown ─── */
+        .scrollable-dropdown {
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .scrollable-dropdown::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .scrollable-dropdown::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .scrollable-dropdown::-webkit-scrollbar-thumb {
+            background: rgba(93, 93, 93, 0.3);
+            border-radius: 1.5px;
+        }
+
+        .scrollable-dropdown::-webkit-scrollbar-thumb:hover {
+            background: rgba(93, 93, 93, 0.8);
+        }
+
+        .spacer { height: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ComboBox Redesign</h1>
+        <p class="subtitle">Mockup comparing current vs proposed dropdown, using existing design system tokens</p>
+
+        <!-- ─── OPEN STATE COMPARISON ─── -->
+        <div class="section-title">Open State</div>
+        <div class="section-desc">Side-by-side of the dropdown when expanded</div>
+
+        <div class="comparison">
+            <!-- Current -->
+            <div class="panel">
+                <div class="panel-label">Current</div>
+                <div class="field-label">Provider</div>
+                <div class="current-combo">
+                    <span>Gemini</span>
+                    <span class="chevron">&#9660;</span>
+                </div>
+                <div class="current-dropdown">
+                    <div class="current-item selected">Gemini</div>
+                    <div class="current-item">OpenRouter</div>
+                    <div class="current-item">Groq</div>
+                </div>
+            </div>
+
+            <!-- Redesigned -->
+            <div class="panel">
+                <div class="panel-label">Redesigned</div>
+                <div class="field-label">Provider</div>
+                <div class="new-combo open">
+                    <span>Gemini</span>
+                    <span class="chevron">&#9660;</span>
+                </div>
+                <div class="new-dropdown">
+                    <div class="new-item selected">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        Gemini
+                    </div>
+                    <div class="new-item">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        OpenRouter
+                    </div>
+                    <div class="new-item">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        Groq
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── CLOSED STATE COMPARISON ─── -->
+        <div class="section-title">Interaction States (Redesigned)</div>
+        <div class="section-desc">Idle, hover, and focused states for the closed dropdown</div>
+
+        <div class="states-grid">
+            <div class="state-card">
+                <div class="state-label">Idle</div>
+                <div class="field-label">Model</div>
+                <div class="new-combo-idle">
+                    <span>gemini-2.0-flash</span>
+                    <span class="chevron-muted">&#9660;</span>
+                </div>
+            </div>
+            <div class="state-card">
+                <div class="state-label">Hover</div>
+                <div class="field-label">Model</div>
+                <div class="new-combo-hover">
+                    <span>gemini-2.0-flash</span>
+                    <span class="chevron-muted">&#9660;</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="states-grid">
+            <div class="state-card">
+                <div class="state-label">Focused / Open</div>
+                <div class="field-label">Model</div>
+                <div class="new-combo-focus">
+                    <span>gemini-2.0-flash</span>
+                    <span class="chevron-muted">&#9660;</span>
+                </div>
+            </div>
+            <div class="state-card">
+                <div class="state-label">Long list (scrollable)</div>
+                <div class="field-label">Model</div>
+                <div class="new-combo open">
+                    <span>gemini-2.0-flash</span>
+                    <span class="chevron">&#9660;</span>
+                </div>
+                <div class="new-dropdown scrollable-dropdown">
+                    <div class="new-item selected">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        gemini-2.0-flash
+                    </div>
+                    <div class="new-item">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        gemini-2.5-pro-preview
+                    </div>
+                    <div class="new-item">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        gemini-1.5-pro
+                    </div>
+                    <div class="new-item">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        gemini-1.5-flash
+                    </div>
+                    <div class="new-item">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        claude-sonnet-4-6
+                    </div>
+                    <div class="new-item">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        claude-haiku-4-5
+                    </div>
+                    <div class="new-item">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        deepseek-v3
+                    </div>
+                    <div class="new-item">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        llama-3.3-70b
+                    </div>
+                    <div class="new-item">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        mistral-large
+                    </div>
+                    <div class="new-item">
+                        <span class="check">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        whisper-large-v3
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── IMPROVEMENTS LIST ─── -->
+        <div class="improvements">
+            <h2>What Changed</h2>
+
+            <div class="improvement-item">
+                <span class="tag tag-visual">Visual</span>
+                <span><strong>Rounded bottom corners on dropdown</strong> (0 0 14px 14px) instead of sharp 0px corners, creating a continuous capsule shape when open.</span>
+            </div>
+
+            <div class="improvement-item">
+                <span class="tag tag-ux">UX</span>
+                <span><strong>Checkmark indicator</strong> on the selected item alongside the existing inverted-color selection. Adds a clear visual cue for which item is active.</span>
+            </div>
+
+            <div class="improvement-item">
+                <span class="tag tag-ux">UX</span>
+                <span><strong>Inverted selection preserved</strong> (white-on-black / black-on-white) — the selected item still uses TextPrimaryBrush background with BgBrush text, matching both themes naturally.</span>
+            </div>
+
+            <div class="improvement-item">
+                <span class="tag tag-polish">Polish</span>
+                <span><strong>Chevron rotation animation</strong> (180deg) on open gives directional feedback.</span>
+            </div>
+
+            <div class="improvement-item">
+                <span class="tag tag-polish">Polish</span>
+                <span><strong>Hover state on closed combo</strong> darkens the border (BorderBrush -> TextSecondaryBrush) before opening, adding an interaction hint.</span>
+            </div>
+
+            <div class="improvement-item">
+                <span class="tag tag-polish">Polish</span>
+                <span><strong>Muted chevron color</strong> (TextMutedBrush) instead of TextPrimaryBrush reduces visual noise in the resting state.</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

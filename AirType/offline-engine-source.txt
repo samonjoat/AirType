@@ -1,0 +1,1 @@
+https://github.com/samonjoat/AirType/releases/download/local-asr-small-en-ct2-v1.0.0/airtype-local-asr-small-en-ct2-win-x64-v1.0.0.json

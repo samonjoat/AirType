@@ -1,0 +1,280 @@
+<Window x:Class="AirType.Views.CapsuleWidget"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CapsuleWidget"
+        Height="40"
+        Width="110"
+        Opacity="{Binding Opacity, Mode=OneWay}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+
+    <Window.Resources>
+        <!-- Animation Easing Functions -->
+        <QuadraticEase x:Key="EaseInOut" EasingMode="EaseInOut"/>
+        <CubicEase x:Key="EaseOut" EasingMode="EaseOut"/>
+        <BackEase x:Key="BackEaseOut" EasingMode="EaseOut" Amplitude="0.3"/>
+
+        <!-- Click Feedback Animation (preserved for code-behind) -->
+        <Storyboard x:Key="ClickFeedbackAnimation">
+            <DoubleAnimation Storyboard.TargetName="CapsuleBorder"
+                           Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                           From="1.0" To="0.95"
+                           Duration="0:0:0.08"
+                           AutoReverse="True"
+                           EasingFunction="{StaticResource EaseOut}"/>
+            <DoubleAnimation Storyboard.TargetName="CapsuleBorder"
+                           Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                           From="1.0" To="0.95"
+                           Duration="0:0:0.08"
+                           AutoReverse="True"
+                           EasingFunction="{StaticResource EaseOut}"/>
+        </Storyboard>
+
+        <!-- Circular edge button (cancel / stop) -->
+        <Style x:Key="CircleButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="{DynamicResource BgBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Opacity" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Circle"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Circle" Property="Background" Value="{DynamicResource BgMutedBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Circle" Property="Background" Value="{DynamicResource BgPanelBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Stop button remains graphite to keep the capsule HUD neutral. -->
+        <Style x:Key="StopButtonStyle" TargetType="Button" BasedOn="{StaticResource CircleButtonStyle}">
+            <Setter Property="Background" Value="{DynamicResource TextStrongBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TextStrongBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource BgBrush}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource TextPrimaryBrush}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource TextPrimaryBrush}"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource TextSecondaryBrush}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource TextSecondaryBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <!-- Pattern A: Fixed container with bottom-anchored scaling -->
+    <Grid Name="WidgetDock"
+          VerticalAlignment="Bottom"
+          HorizontalAlignment="Center"
+          Height="30"
+          Width="100"
+          ClipToBounds="True"
+          UseLayoutRounding="True"
+          SnapsToDevicePixels="True">
+
+        <Grid Name="CapsuleContainer"
+              VerticalAlignment="Bottom"
+              Width="100"
+              Height="30"
+              RenderTransformOrigin="0.5,1.0"
+              MouseLeftButtonDown="CapsuleBorder_MouseLeftButtonDown"
+              MouseLeftButtonUp="CapsuleBorder_MouseLeftButtonUp">
+            <Grid.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform x:Name="ScaleT" ScaleX="0.4" ScaleY="0.3333"/>
+                    <TranslateTransform x:Name="TransT" X="0" Y="0"/>
+                </TransformGroup>
+            </Grid.RenderTransform>
+
+            <!-- Flat, theme-aware surface. Window-level opacity (driven by VM
+                 state: 0.45 minimal / 0.65 hover / 1.0 recording / 1.0 transcribing)
+                 handles the idle-translucent vs active-solid feel. -->
+            <Border Name="CapsuleBackground"
+                    CornerRadius="15"
+                    Background="{DynamicResource BgPanelBrush}"
+                    Effect="{DynamicResource Elevation2}"/>
+
+            <!-- Border that shifts color by state -->
+            <Border Name="CapsuleOutline"
+                    CornerRadius="15"
+                    BorderThickness="1">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                <Setter Property="BorderBrush" Value="{DynamicResource TextStrongBrush}"/>
+                                <Setter Property="BorderThickness" Value="1.5"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsTranscribing}" Value="True">
+                                <Setter Property="BorderBrush" Value="{DynamicResource TextStrongBrush}"/>
+                                <Setter Property="BorderThickness" Value="1.5"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+            </Border>
+
+            <Grid Name="ContentGrid" Margin="4,0,4,0">
+                <!-- Recording dot (visible only while recording, pulses) -->
+                <Ellipse Width="6" Height="6"
+                         HorizontalAlignment="Left"
+                         VerticalAlignment="Center"
+                         Margin="4,0,0,0"
+                         Fill="{DynamicResource TextStrongBrush}">
+                    <Ellipse.Style>
+                        <Style TargetType="Ellipse">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                 From="0.35" To="1.0"
+                                                                 Duration="0:0:0.9"
+                                                                 EasingFunction="{StaticResource EaseInOut}"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.EnterActions>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Ellipse.Style>
+                </Ellipse>
+
+                <!-- Cancel Button (Left) -->
+                <Button Name="CancelButton"
+                        Style="{StaticResource CircleButtonStyle}"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Visibility="{Binding ControlsVisibility, Mode=OneWay}"
+                        Content="×"
+                        FontSize="12"
+                        Focusable="False"
+                        Click="CancelButton_Click"/>
+
+                <!-- Waveform Display (Center) -->
+                <Canvas Name="WaveformCanvas"
+                        Margin="{Binding WaveformMargin, Mode=OneWay}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        ClipToBounds="True"
+                        SizeChanged="WaveformCanvas_SizeChanged"
+                        MouseLeftButtonDown="WaveformCanvas_MouseLeftButtonDown"
+                        MouseLeftButtonUp="WaveformCanvas_MouseLeftButtonUp">
+                    <Canvas.Style>
+                        <Style TargetType="Canvas">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsFailureFlash}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Canvas.Style>
+                    <Rectangle Name="WaveformBackdrop"
+                               Width="{Binding ActualWidth, ElementName=WaveformCanvas}"
+                               Height="{Binding ActualHeight, ElementName=WaveformCanvas}"
+                               RadiusX="2"
+                               RadiusY="2"
+                               Fill="Transparent"
+                               StrokeThickness="0"/>
+                    <Path Name="WaveformPath"
+                          StrokeThickness="1.2"
+                          StrokeStartLineCap="Round"
+                          StrokeEndLineCap="Round"
+                          Data="M 0,6 L 60,6"
+                          Stretch="None"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Top"
+                          SnapsToDevicePixels="True"
+                          IsHitTestVisible="False">
+                        <Path.Style>
+                            <Style TargetType="Path">
+                                <Setter Property="Opacity" Value="1"/>
+                                <Setter Property="Stroke" Value="{DynamicResource TextSecondaryBrush}"/>
+                                <Setter Property="Fill" Value="{DynamicResource TextSecondaryBrush}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                        <Setter Property="Stroke" Value="{DynamicResource TextStrongBrush}"/>
+                                        <Setter Property="Fill" Value="{DynamicResource TextStrongBrush}"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsTranscribing}" Value="True">
+                                        <Setter Property="Stroke" Value="{DynamicResource TextStrongBrush}"/>
+                                        <Setter Property="Fill" Value="{DynamicResource TextStrongBrush}"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsCleaning}" Value="True">
+                                        <Setter Property="Stroke" Value="{DynamicResource TextStrongBrush}"/>
+                                        <Setter Property="Fill" Value="{DynamicResource TextStrongBrush}"/>
+                                        <Setter Property="Opacity" Value="0.82"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Path.Style>
+                    </Path>
+                </Canvas>
+
+                <!-- Failure-only flash: success stays sound-only -->
+                <Grid IsHitTestVisible="False">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsFailureFlash}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <TextBlock Text="!"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextStrongBrush}"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               LineHeight="11"/>
+                </Grid>
+
+                <!-- Stop Button (Right) -->
+                <Button Name="StopButton"
+                        Style="{StaticResource StopButtonStyle}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Visibility="{Binding ControlsVisibility, Mode=OneWay}"
+                        Content="■"
+                        FontSize="8"
+                        Focusable="False"
+                        Click="StopButton_Click"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

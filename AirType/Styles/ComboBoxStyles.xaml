@@ -1,0 +1,219 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:converters="clr-namespace:AirType.Converters"
+                    xmlns:helpers="clr-namespace:AirType.Helpers">
+
+    <converters:BottomRoundedClipConverter x:Key="BottomRoundedClipConverter"/>
+
+    <!-- Custom ComboBox Style (From WpfDictationUI) -->
+    <Style x:Key="CustomComboBox" TargetType="ComboBox">
+        <Setter Property="FontFamily" Value="{DynamicResource AppFont}"/>
+        <Setter Property="Background" Value="{DynamicResource BgBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="13,0"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="MinHeight" Value="38"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="helpers:PopupPlacementHelper.AutoFlip" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <!-- Main Display Border -->
+                        <Border x:Name="MainBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{DynamicResource FieldCornerRadius}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Toggle Button (Clickable area) -->
+                                <ToggleButton x:Name="ToggleButton"
+                                            Grid.ColumnSpan="2"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Focusable="False"
+                                            IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ClickMode="Press">
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border Background="Transparent"/>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                </ToggleButton>
+                                
+                                <!-- Selected Item Display -->
+                                <ContentPresenter Grid.Column="0"
+                                                Content="{TemplateBinding SelectionBoxItem}"
+                                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                Margin="{TemplateBinding Padding}"
+                                                IsHitTestVisible="False"/>
+                                
+                                <!-- Chevron Icon -->
+                                <materialDesign:PackIcon x:Name="ChevronIcon"
+                                                       Grid.Column="1"
+                                                       Kind="ChevronDown"
+                                                       Width="15" Height="15"
+                                                       Foreground="{DynamicResource TextMutedBrush}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,14,0"
+                                                       IsHitTestVisible="False"
+                                                       RenderTransformOrigin="0.5,0.5">
+                                    <materialDesign:PackIcon.RenderTransform>
+                                        <RotateTransform Angle="0"/>
+                                    </materialDesign:PackIcon.RenderTransform>
+                                </materialDesign:PackIcon>
+                            </Grid>
+                        </Border>
+                        
+                        <!-- Dropdown Popup -->
+                        <Popup x:Name="PART_Popup"
+                               AllowsTransparency="True"
+                               Placement="Bottom"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               PopupAnimation="Slide"
+                               Focusable="False">
+                            <Border BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1,0,1,1"
+                                    CornerRadius="0,0,14,14"
+                                    Margin="0"
+                                    MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+                                <Border x:Name="DropdownClipBorder"
+                                        Background="{DynamicResource BgBrush}"
+                                        CornerRadius="0,0,13,13">
+                                    <Border.Clip>
+                                        <MultiBinding Converter="{StaticResource BottomRoundedClipConverter}">
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource Self}"/>
+                                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Self}"/>
+                                        </MultiBinding>
+                                    </Border.Clip>
+                                    <ScrollViewer MaxHeight="220"
+                                                  Style="{DynamicResource MinimalScrollViewer}"
+                                                  VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Disabled"
+                                                  Margin="0"
+                                                  Padding="0"
+                                                  CanContentScroll="False">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"
+                                                      x:Name="ItemsPresenter"
+                                                      Margin="0"
+                                                      VerticalAlignment="Top"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <!-- Hover state on closed combo -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource BorderStrongBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource FocusRingBrush}"/>
+                        </Trigger>
+                        <!-- Border color, corner radius, and chevron rotation when open -->
+                        <Trigger Property="IsDropDownOpen" Value="True">
+                            <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource FocusRingBrush}"/>
+                            <Setter TargetName="MainBorder" Property="CornerRadius" Value="10,10,0,0"/>
+                            <Setter TargetName="ChevronIcon" Property="RenderTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="180"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- Custom ComboBoxItem Style (From WpfDictationUI) -->
+    <Style x:Key="CustomComboBoxItem" TargetType="ComboBoxItem">
+        <Setter Property="FontFamily" Value="{DynamicResource AppFont}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="Padding" Value="13,9"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Tag" Value="NotLast"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border x:Name="ItemBorder"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            CornerRadius="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <materialDesign:PackIcon x:Name="CheckIcon"
+                                                    Grid.Column="0"
+                                                    Kind="Check"
+                                                    Width="14" Height="14"
+                                                    VerticalAlignment="Center"
+                                                    Margin="0,0,8,0"
+                                                    Visibility="Collapsed"/>
+                            <ContentPresenter Grid.Column="1"
+                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!-- 1. Hover highlight (mouse-over only, so it clears the moment the cursor leaves the item) -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BgMutedBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BgMutedBrush}"/>
+                        </Trigger>
+
+                        <!-- 2. Selected state (Higher Priority: Overrides Highlight) -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource TextStrongBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource BgPanelBrush}"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="CheckIcon" Property="Foreground" Value="{DynamicResource BgPanelBrush}"/>
+                        </Trigger>
+
+                        <!-- 3. If both Selected and Highlighted (Initial state), keep it looking Selected -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True"/>
+                                <Condition Property="IsHighlighted" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource TextStrongBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource BgPanelBrush}"/>
+                        </MultiTrigger>
+
+                        <!-- 4. Last Item always clips to rounded dropdown bottom -->
+                        <Trigger Property="Tag" Value="Last">
+                            <Setter TargetName="ItemBorder" Property="CornerRadius" Value="0,0,10,10"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- PROFESSIONAL TIER: Implicit Styles -->
+    <Style TargetType="ComboBox" BasedOn="{StaticResource CustomComboBox}"/>
+    <Style TargetType="ComboBoxItem" BasedOn="{StaticResource CustomComboBoxItem}"/>
+
+</ResourceDictionary>

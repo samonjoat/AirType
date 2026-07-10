@@ -1,0 +1,45 @@
+<UserControl x:Class="AirType.Views.EditNoteContent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d"
+             Width="550">
+
+    <StackPanel>
+        <!-- Title -->
+        <TextBlock Text="Edit Note"
+                   Style="{DynamicResource PageHeader}"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,24"/>
+
+        <!-- Content Editor -->
+        <TextBox x:Name="ContentTextBox"
+                 Style="{DynamicResource CustomTextArea}"
+                 MinHeight="200"
+                 Margin="0,0,0,24"
+                 FontSize="14"/>
+
+        <!-- Action Buttons -->
+        <Grid>
+            <!-- Delete button on left -->
+            <Button HorizontalAlignment="Left"
+                    Style="{DynamicResource BaseButton}"
+                    Foreground="{DynamicResource ErrorBrush}"
+                    Click="Delete_Click"
+                    ToolTip="Delete this note">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="TrashCanOutline" Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Delete" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <!-- Cancel and Save on right -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Cancel" Margin="0,0,12,0" Click="Cancel_Click"/>
+                <Button Content="Save Changes" Style="{DynamicResource PrimaryButton}" Click="Save_Click"/>
+            </StackPanel>
+        </Grid>
+    </StackPanel>
+</UserControl>

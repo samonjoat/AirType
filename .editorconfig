@@ -1,0 +1,20 @@
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{cs,xaml,csproj,props,targets,ps1,sln}]
+end_of_line = crlf
+
+[*.{json,md,py,toml,txt,yml,yaml}]
+end_of_line = lf
+
+[*.{cs,py}]
+indent_style = space
+indent_size = 4
+
+[*.{xaml,csproj,props,targets,json,yml,yaml}]
+indent_style = space
+indent_size = 2

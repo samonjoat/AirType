@@ -1,0 +1,45 @@
+﻿{
+    "schemaVersion":  1,
+    "testedUtc":  "2026-07-10T15:21:35.5087666Z",
+    "os":  {
+               "caption":  "Microsoft Windows 10 Enterprise LTSC Evaluation",
+               "version":  "10.0.19044",
+               "buildNumber":  "19044",
+               "architecture":  "64-bit",
+               "totalPhysicalMemory":  6441979904
+           },
+    "cleanEnvironment":  {
+                             "dotnetDesktopRuntimeRoots":  [
+
+                                                           ],
+                             "pythonRuntimeRoots":  [
+
+                                                    ],
+                             "windowsAppRuntimePackageCount":  0
+                         },
+    "app":  {
+                "sha256":  "33cd18122376ddcd92294254ba599e797c0b9702e77a700a2a5844b4f9581c29",
+                "fileVersion":  "1.0.0.0",
+                "signatureStatus":  "NotSigned",
+                "firstLaunch":  {
+                                    "processId":  5484,
+                                    "mainWindowHandle":  131562,
+                                    "dataFileCount":  3
+                                },
+                "restart":  {
+                                "processId":  3960,
+                                "mainWindowHandle":  393310,
+                                "dataFileCount":  4
+                            }
+            },
+    "localAsr":  {
+                     "sha256":  "a6f05138713b2eae78cb573fe51c201731ad34ab06ed7d5b8cfc58491e646ac8",
+                     "portableRuntimeImports":  true,
+                     "visualCppRuntimeAppLocal":  true,
+                     "basePrefixEqualsPrefix":  true,
+                     "modelInference":  true,
+                     "inferenceDurationSeconds":  0.5,
+                     "inferenceCpuThreads":  4,
+                     "removalComplete":  true
+                 }
+}

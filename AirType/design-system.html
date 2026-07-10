@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirType Design System</title>
+    <style>
+        * { box-sizing: border-box; }
+        :root {
+            --light-bg: #F4F0E9;
+            --light-surface: #FBF8F2;
+            --light-surface-alt: #FFFFFF;
+            --light-well: #EAE4D9;
+            --light-ink: #211E19;
+            --light-ink-strong: #141414;
+            --light-secondary: #6E665B;
+            --light-muted: #5F554A;
+            --light-placeholder: #9A9082;
+            --light-border: #DBD4C8;
+            --light-border-strong: #CFC6B8;
+            --light-accent: #4860FF;
+            --light-accent-hover: #263DCC;
+            --dark-bg: #131313;
+            --dark-surface: #1F1F1F;
+            --dark-well: #252525;
+            --dark-ink: #FFFFFF;
+            --dark-secondary: #B5B5B5;
+            --dark-muted: #A0A0A0;
+            --dark-border: #333333;
+            --dark-accent: #7C8CFF;
+            --dark-accent-hover: #A9B3FF;
+            --success: #2E7D32;
+            --warning: #F9A825;
+            --error: #C62828;
+            --fire-1: #FFF7ED;
+            --fire-2: #FFEDD5;
+            --fire-3: #FED7AA;
+            --fire-4: #F97316;
+            --fire-5: #9A3412;
+        }
+
+        body {
+            margin: 0 auto;
+            max-width: 1120px;
+            padding: 40px 24px 80px;
+            background: var(--light-bg);
+            color: var(--light-ink);
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            line-height: 1.55;
+        }
+
+        h1 { margin: 0 0 6px; font-size: 32px; line-height: 1.15; }
+        h2 { margin: 48px 0 18px; padding-bottom: 10px; border-bottom: 1px solid var(--light-border); font-size: 22px; }
+        h3 { margin: 26px 0 12px; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--light-muted); }
+        p { margin: 0 0 14px; color: var(--light-secondary); }
+        code { padding: 2px 6px; border-radius: 5px; background: var(--light-well); font-family: "IBM Plex Mono", Consolas, monospace; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; font-size: 13px; background: var(--light-surface); border: 1px solid var(--light-border); border-radius: 12px; overflow: hidden; }
+        th, td { padding: 10px 12px; border-bottom: 1px solid var(--light-border); text-align: left; vertical-align: top; }
+        tr:last-child td { border-bottom: 0; }
+        th { color: var(--light-muted); font-size: 11px; letter-spacing: .8px; text-transform: uppercase; background: var(--light-well); }
+
+        .lede { max-width: 780px; font-size: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+        .swatch { background: var(--light-surface); border: 1px solid var(--light-border); border-radius: 12px; padding: 12px; }
+        .chip { height: 54px; border-radius: 10px; border: 1px solid rgba(0,0,0,.10); margin-bottom: 10px; }
+        .name { font-weight: 700; font-size: 13px; }
+        .value { color: var(--light-muted); font-family: "IBM Plex Mono", Consolas, monospace; font-size: 12px; }
+        .note { background: var(--light-surface); border: 1px solid var(--light-border); border-radius: 14px; padding: 16px; }
+        .dark { background: var(--dark-bg); color: var(--dark-ink); }
+        .dark .swatch, .dark.note { background: var(--dark-surface); border-color: var(--dark-border); }
+        .dark .value, .dark p { color: var(--dark-muted); }
+        .sample-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        .button { height: 32px; border-radius: 8px; padding: 0 13px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--light-border); background: var(--light-surface); font-size: 12px; font-weight: 600; }
+        .button.primary { background: var(--light-ink-strong); color: var(--light-surface); border-color: var(--light-ink-strong); }
+        .badge { border: 1px solid var(--light-border); background: var(--light-well); border-radius: 8px; padding: 3px 9px; color: var(--light-secondary); font-size: 11px; font-weight: 500; }
+        .pill { border-radius: 999px; }
+        .toast { max-width: 340px; border: 1px solid var(--light-border); background: var(--light-surface); border-radius: 12px; padding: 14px; box-shadow: 0 14px 34px rgba(0,0,0,.08); }
+    </style>
+</head>
+<body>
+    <h1>AirType Design System</h1>
+    <p class="lede">Source of truth for the approved Slate redesign. The generated Slate handoff folder is read-only; implementation maps these values into WPF theme resources and shared styles.</p>
+
+    <section>
+        <h2>Source</h2>
+        <div class="note">
+            <p><strong>Active Slate handoff:</strong> <code>design-assets/slate-handoff-2026-06-20-airtype-final-redesign/</code></p>
+            <p><strong>Light page:</strong> Graphite Accent Refined</p>
+            <p><strong>Dark page:</strong> Graphite Dark Theme</p>
+            <p><strong>Dominant direction:</strong> professional graphite surfaces with restrained logo-blue accents.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Light Theme Tokens</h2>
+        <div class="grid">
+            <div class="swatch"><div class="chip" style="background:#F4F0E9"></div><div class="name">Canvas</div><div class="value">#F4F0E9 / BgBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#FBF8F2"></div><div class="name">Surface</div><div class="value">#FBF8F2 / BgPanelBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#FFFFFF"></div><div class="name">Raised Surface</div><div class="value">#FFFFFF / SurfaceAltBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#EAE4D9"></div><div class="name">Well</div><div class="value">#EAE4D9 / BgMutedBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#211E19"></div><div class="name">Ink</div><div class="value">#211E19 / TextPrimaryBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#6E665B"></div><div class="name">Secondary</div><div class="value">#6E665B / TextSecondaryBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#5F554A"></div><div class="name">Muted</div><div class="value">#5F554A / TextMutedBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#DBD4C8"></div><div class="name">Border</div><div class="value">#DBD4C8 / BorderBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#4860FF"></div><div class="name">Logo Blue</div><div class="value">#4860FF / AccentBrush</div></div>
+        </div>
+    </section>
+
+    <section class="dark note">
+        <h2>Dark Theme Tokens</h2>
+        <div class="grid">
+            <div class="swatch"><div class="chip" style="background:#131313"></div><div class="name">Canvas</div><div class="value">#131313 / BgBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#1F1F1F"></div><div class="name">Surface</div><div class="value">#1F1F1F / BgPanelBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#252525"></div><div class="name">Well</div><div class="value">#252525 / BgMutedBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#FFFFFF"></div><div class="name">Text</div><div class="value">#FFFFFF / TextPrimaryBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#B5B5B5"></div><div class="name">Secondary</div><div class="value">#B5B5B5 / TextSecondaryBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#A0A0A0"></div><div class="name">Muted</div><div class="value">#A0A0A0 / TextMutedBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#333333"></div><div class="name">Divider</div><div class="value">#333333 / BorderBrush</div></div>
+            <div class="swatch"><div class="chip" style="background:#7C8CFF"></div><div class="name">Accent</div><div class="value">#7C8CFF / AccentBrush</div></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Typography</h2>
+        <table>
+            <tr><th>Style</th><th>Spec</th><th>Use</th></tr>
+            <tr><td><code>PageTitle</code></td><td>Inter 22px, 700</td><td>Page titles</td></tr>
+            <tr><td><code>PageHeader</code></td><td>Inter 16-18px, 600</td><td>Section headers and dialog titles</td></tr>
+            <tr><td><code>SectionHeader</code></td><td>Inter 11px, 600, uppercase, tracked</td><td>Sidebar and grouped labels</td></tr>
+            <tr><td><code>BodyText</code></td><td>Inter 13px, 400</td><td>Primary body copy</td></tr>
+            <tr><td><code>SmallText</code></td><td>Inter 11px, 400</td><td>Metadata and helper copy</td></tr>
+            <tr><td><code>CodeStats</code></td><td>IBM Plex Mono or Consolas fallback, 11-12px</td><td>Timestamps, stats, latency, logs</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Radius And Spacing</h2>
+        <table>
+            <tr><th>Token</th><th>Value</th><th>Use</th></tr>
+            <tr><td><code>ButtonCornerRadius</code></td><td>8</td><td>Buttons, icon buttons, keycaps, and default badges</td></tr>
+            <tr><td><code>SelectCornerRadius</code></td><td>10</td><td>Segmented controls, dropdowns, search fields</td></tr>
+            <tr><td><code>FieldCornerRadius</code></td><td>10</td><td>Inputs and compact wells</td></tr>
+            <tr><td><code>PanelCornerRadius</code></td><td>14</td><td>Cards, panels, tables</td></tr>
+            <tr><td><code>ModalCornerRadius</code></td><td>14</td><td>Dialogs</td></tr>
+            <tr><td><code>PillCornerRadius</code></td><td>999</td><td>Explicit pill controls only, not default badges</td></tr>
+            <tr><td><code>PagePadding</code></td><td>32 horizontal, 28 top</td><td>Main content shell rhythm from Slate</td></tr>
+            <tr><td><code>WindowFooterHeight</code></td><td>28</td><td>Bottom shell bar that keeps page content from touching the window edge</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Accent Rules</h2>
+        <table>
+            <tr><th>Element</th><th>Accent Treatment</th></tr>
+            <tr><td>History timeline dots</td><td>Logo blue. Light uses <code>#4860FF</code>; dark uses theme accent <code>#7C8CFF</code>.</td></tr>
+            <tr><td>Settings latency bars</td><td>Logo blue/accent only. Each segment keeps a readable minimum width and shows its latency value directly in white code text.</td></tr>
+            <tr><td>Word activity/history</td><td>One-color line chart. No multi-color bars.</td></tr>
+            <tr><td>Current streak</td><td>Restrained fire gradient. It may use orange, but graphite remains dominant.</td></tr>
+            <tr><td>Capsule HUD</td><td>Strict graphite. No blue, red, green, or fire treatment except existing state clarity where unavoidable.</td></tr>
+            <tr><td>Toasts</td><td>No red/green left border. Use neutral frame with semantic text/icon only.</td></tr>
+            <tr><td>Focus / selection borders</td><td>Neutral graphite <code>FocusRingBrush</code> (light <code>#8A8175</code>, dark <code>#8A8A8A</code>) — never logo-blue. The logo-blue accent is reserved for data-viz (timeline dots, latency bars, charts) and the logo mark.</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Component Samples</h2>
+        <div class="sample-row">
+            <span class="button">Secondary</span>
+            <span class="button primary">Primary</span>
+            <span class="badge">Gemini</span>
+            <span class="badge">0:08 / 38 words</span>
+            <span class="badge pill">Optional pill</span>
+        </div>
+        <h3>Segmented Control</h3>
+        <p>Use <code>SegmentedControlRail</code> with <code>TabRadioButton</code>. Rails use <code>SelectCornerRadius</code>, not pill radius; checked state must win over hover state so text contrast remains valid in light and dark.</p>
+        <h3>Toast</h3>
+        <div class="toast">
+            <strong>Transcription complete</strong>
+            <p style="margin-top:4px">Neutral frame with semantic content, no colored left border.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>XAML Reference</h2>
+        <table>
+            <tr><th>Role</th><th>Resource</th></tr>
+            <tr><td>Page background</td><td><code>{DynamicResource BgBrush}</code></td></tr>
+            <tr><td>Cards and panels</td><td><code>{DynamicResource BgPanelBrush}</code></td></tr>
+            <tr><td>Wells, hovers, inputs</td><td><code>{DynamicResource BgMutedBrush}</code></td></tr>
+            <tr><td>Primary text</td><td><code>{DynamicResource TextPrimaryBrush}</code></td></tr>
+            <tr><td>Secondary text</td><td><code>{DynamicResource TextSecondaryBrush}</code></td></tr>
+            <tr><td>Muted metadata</td><td><code>{DynamicResource TextMutedBrush}</code></td></tr>
+            <tr><td>Dividers</td><td><code>{DynamicResource BorderBrush}</code></td></tr>
+            <tr><td>Intentional accent</td><td><code>{DynamicResource AccentBrush}</code></td></tr>
+            <tr><td>Focus / selection ring</td><td><code>{DynamicResource FocusRingBrush}</code> — neutral graphite focus/hover border</td></tr>
+            <tr><td>Segmented rail</td><td><code>{DynamicResource SegmentedControlRail}</code></td></tr>
+            <tr><td>Segmented item</td><td><code>{DynamicResource TabRadioButton}</code></td></tr>
+            <tr><td>History metadata badges</td><td><code>{DynamicResource HistoryMetaBadge}</code></td></tr>
+            <tr><td>Default badges/keycaps/status</td><td><code>{DynamicResource Badge}</code> uses button radius, not pill radius</td></tr>
+            <tr><td>True pill badges</td><td><code>{DynamicResource PillBadge}</code></td></tr>
+        </table>
+    </section>
+</body>
+</html>

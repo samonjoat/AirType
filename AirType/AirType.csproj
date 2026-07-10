@@ -1,0 +1,123 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>AirType</RootNamespace>
+    <AssemblyName>AirType</AssemblyName>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <InformationalVersion>1.0.0</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <Authors>AirType</Authors>
+    <Company>AirType</Company>
+    <Description>Global voice dictation and transcription for Windows.</Description>
+    <Copyright>Copyright (c) 2026 AirType</Copyright>
+    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/samonjoat/AirType</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <ApplicationIcon>airtype.ico</ApplicationIcon>
+    <WindowsPackageType>None</WindowsPackageType>
+    <EnableCoreMrtTooling>false</EnableCoreMrtTooling>
+    <IncludeBundledLocalAsrModel>false</IncludeBundledLocalAsrModel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
+    <PackageReference Include="MaterialDesignColors" Version="3.0.0" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="Phonix" Version="1.0.2" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.118" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Polly" Version="8.2.0" />
+    <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="9.0.0" />
+    <PackageReference Include="Concentus" Version="2.2.2" />
+    <PackageReference Include="Concentus.OggFile" Version="1.0.6" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Fonts\Inter\Inter-VariableFont_opsz,wght.ttf" />
+    <Resource Include="Fonts\Inter\Inter-Italic-VariableFont_opsz,wght.ttf" />
+    <Resource Include="Assets\Logo\*.png" />
+    <Resource Include="airtype.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Sounds\*.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\Inter\OFL.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\LICENSE"
+             Link="LICENSE"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\PRIVACY.md"
+             Link="PRIVACY.md"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\THIRD_PARTY_NOTICES.md"
+             Link="THIRD_PARTY_NOTICES.md"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\SECURITY.md"
+             Link="SECURITY.md"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\docs\INSTALL.md"
+             Link="INSTALL.md"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="offline-engine-source.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\AirType.LocalAsrWorker\pyproject.toml"
+             Link="LocalAsrWorker\pyproject.toml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\AirType.LocalAsrWorker\requirements-runtime.txt"
+             Link="LocalAsrWorker\requirements-runtime.txt"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\AirType.LocalAsrWorker\airtype_asr_worker\**\*.*"
+             Link="LocalAsrWorker\airtype_asr_worker\%(RecursiveDir)%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\AirType.LocalAsrWorker\runtime\**\*.*"
+             Link="LocalAsrWorker\runtime\%(RecursiveDir)%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\AirType.LocalAsrWorker\models\ct2\small.en\**\*.*"
+             Link="LocalAsrWorker\models\ct2\small.en\%(RecursiveDir)%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest"
+             Condition="'$(IncludeBundledLocalAsrModel)' == 'true'" />
+  </ItemGroup>
+
+  <Target Name="RemoveLegacyLocalAsrBuildArtifacts" BeforeTargets="CopyFilesToOutputDirectory">
+    <RemoveDir Directories="$(TargetDir)LocalAsrWorker\.venv"
+               Condition="'$(TargetDir)' != '' And Exists('$(TargetDir)LocalAsrWorker\.venv')" />
+    <RemoveDir Directories="$(TargetDir)LocalAsrWorker\models"
+               Condition="'$(TargetDir)' != '' And Exists('$(TargetDir)LocalAsrWorker\models')" />
+  </Target>
+
+  <Target Name="CleanLocalAsrPublishDirectory" BeforeTargets="_CopyResolvedFilesToPublishPreserveNewest">
+    <RemoveDir Directories="$(PublishDir)LocalAsrWorker"
+               Condition="'$(PublishDir)' != '' And Exists('$(PublishDir)LocalAsrWorker')" />
+  </Target>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controls\" />
+    <Folder Include="Converters\" />
+    <Folder Include="Fonts\" />
+    <Folder Include="Models\" />
+    <Folder Include="Services\" />
+    <Folder Include="Styles\" />
+    <Folder Include="Themes\" />
+    <Folder Include="ViewModels\" />
+    <Folder Include="Views\" />
+  </ItemGroup>
+</Project>

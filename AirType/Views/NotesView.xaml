@@ -1,0 +1,332 @@
+<UserControl x:Class="AirType.Views.NotesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:AirType.ViewModels"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance viewmodels:NotesViewModel}">
+
+    <Grid Background="{DynamicResource BgBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                BorderBrush="{DynamicResource DividerBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="32,28,32,18">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Notes" Style="{DynamicResource PageTitle}"/>
+                    <TextBlock Text="Capture a thought, or hold the hotkey to dictate one"
+                               Style="{DynamicResource BodyText}"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Margin="0,4,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Style="{DynamicResource MinimalScrollViewer}">
+            <StackPanel Margin="32,22,32,28">
+
+                <!-- INPUT SECTION -->
+                <Border Background="{DynamicResource BgPanelBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{DynamicResource PanelCornerRadius}"
+                        Padding="18"
+                        Margin="0,0,0,18">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid>
+                            <TextBox x:Name="NotesTextBox"
+                                     Style="{DynamicResource CustomTextArea}"
+                                     Text="{Binding NewNoteContent, UpdateSourceTrigger=PropertyChanged}"
+                                     MinHeight="96"
+                                     materialDesign:HintAssist.Hint="Start a note, or hold Space to dictate..."
+                                     AutomationProperties.Name="New note"
+                                     FontSize="14"/>
+                        </Grid>
+
+                        <Grid Grid.Row="1" Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0"
+                                    Style="{DynamicResource PrimaryButton}"
+                                    HorizontalAlignment="Left"
+                                    Width="36" Height="36" Padding="0"
+                                    Click="MicButton_Click"
+                                    AutomationProperties.Name="Record voice note"
+                                    ToolTip="Record voice note (click to start, click to stop)">
+                                <Grid>
+                                    <materialDesign:PackIcon Kind="Microphone" Width="18" Height="18">
+                                        <materialDesign:PackIcon.Style>
+                                            <Style TargetType="materialDesign:PackIcon">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsTranscribing}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </materialDesign:PackIcon.Style>
+                                    </materialDesign:PackIcon>
+
+                                    <materialDesign:PackIcon Kind="Stop" Width="18" Height="18">
+                                        <materialDesign:PackIcon.Style>
+                                            <Style TargetType="materialDesign:PackIcon">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </materialDesign:PackIcon.Style>
+                                    </materialDesign:PackIcon>
+
+                                    <materialDesign:PackIcon Kind="Sync" Width="18" Height="18"
+                                                             RenderTransformOrigin="0.5,0.5">
+                                        <materialDesign:PackIcon.RenderTransform>
+                                            <RotateTransform Angle="0"/>
+                                        </materialDesign:PackIcon.RenderTransform>
+                                        <materialDesign:PackIcon.Style>
+                                            <Style TargetType="materialDesign:PackIcon">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsTranscribing}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard x:Name="SpinStoryboard">
+                                                                <Storyboard>
+                                                                    <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                                                     From="0" To="360"
+                                                                                     Duration="0:0:1"
+                                                                                     RepeatBehavior="Forever"/>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </DataTrigger.EnterActions>
+                                                        <DataTrigger.ExitActions>
+                                                            <StopStoryboard BeginStoryboardName="SpinStoryboard"/>
+                                                        </DataTrigger.ExitActions>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </materialDesign:PackIcon.Style>
+                                    </materialDesign:PackIcon>
+                                </Grid>
+                            </Button>
+
+                            <TextBlock Grid.Column="1"
+                                       Text="Tap to dictate"
+                                       Style="{DynamicResource BodyText}"
+                                       Foreground="{DynamicResource TextMutedBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="12,0,0,0"/>
+
+                            <Button Grid.Column="2"
+                                    Style="{DynamicResource PrimaryButton}"
+                                    Command="{Binding AddNoteCommand}"
+                                    AutomationProperties.Name="Save note"
+                                    Content="Save note"
+                                    Padding="18,8"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- TOOLBAR -->
+                <Grid Margin="0,0,0,24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Search Box -->
+                    <TextBox Grid.Column="0" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                           Style="{DynamicResource SearchBox}"
+                           AutomationProperties.Name="Search notes"
+                           materialDesign:HintAssist.Hint="Search notes"/>
+
+                    <!-- View Toggles -->
+                    <Border Grid.Column="2" Style="{DynamicResource SegmentedControlRail}">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Style="{DynamicResource TabRadioButton}" 
+                                       IsChecked="{Binding IsListView}"
+                                       GroupName="ViewToggle"
+                                       AutomationProperties.Name="List view"
+                                       Padding="6">
+                                <materialDesign:PackIcon Kind="FormatListBulleted" Width="18" Height="18"/>
+                            </RadioButton>
+                            <RadioButton Style="{DynamicResource TabRadioButton}" 
+                                       IsChecked="{Binding IsListView, Converter={StaticResource BooleanInverterConverter}}"
+                                       GroupName="ViewToggle"
+                                       AutomationProperties.Name="Grid view"
+                                       Padding="6">
+                                <materialDesign:PackIcon Kind="ViewGrid" Width="18" Height="18"/>
+                            </RadioButton>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- NOTES FEED -->
+                <ItemsControl ItemsSource="{Binding Notes}">
+                    <ItemsControl.Style>
+                        <Style TargetType="ItemsControl">
+                            <Setter Property="ItemsPanel">
+                                <Setter.Value>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel/>
+                                    </ItemsPanelTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <!-- In list view, items stretch to full width -->
+                            <Setter Property="ItemContainerStyle">
+                                <Setter.Value>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                    </Style>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsListView}" Value="False">
+                                    <Setter Property="ItemsPanel">
+                                        <Setter.Value>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+                                            </ItemsPanelTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <!-- In grid view, items have natural width -->
+                                    <Setter Property="ItemContainerStyle">
+                                        <Setter.Value>
+                                            <Style TargetType="ContentPresenter">
+                                                <Setter Property="HorizontalAlignment" Value="Left"/>
+                                            </Style>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ItemsControl.Style>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding DataContext.EditNoteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}"
+                                    AutomationProperties.Name="{Binding DisplayTitle, StringFormat='Open note {0}'}"
+                                    AutomationProperties.HelpText="{Binding DisplayBody}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                        <!-- Default: List view - stretch to full width -->
+                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="Margin" Value="0,0,0,16"/>
+                                        <Style.Triggers>
+                                            <!-- Grid view: Fixed 4:3 cards -->
+                                            <DataTrigger Binding="{Binding DataContext.IsListView, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False">
+                                                <Setter Property="Width" Value="262"/>
+                                                <Setter Property="Height" Value="128"/>
+                                                <Setter Property="Margin" Value="0,0,16,16"/>
+                                                <Setter Property="HorizontalAlignment" Value="Left"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="NoteBorder" Style="{DynamicResource ShadowCard}"
+                                                Background="{DynamicResource BgPanelBrush}"
+                                                Padding="18" CornerRadius="14" Cursor="Hand">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Text="{Binding DisplayTitle}"
+                                                           Style="{DynamicResource PageHeader}"
+                                                           FontSize="14"
+                                                           TextTrimming="CharacterEllipsis"/>
+
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding DisplayBody}"
+                                                           Style="{DynamicResource CardBody}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           TextWrapping="Wrap"
+                                                           MaxHeight="52"
+                                                           FontSize="13"
+                                                           Margin="0,6,0,0"/>
+
+                                                <Grid Grid.Row="2" Margin="0,8,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Text="{Binding DateDisplay}"
+                                                               Style="{DynamicResource SmallText}"
+                                                               Foreground="{DynamicResource TextMutedBrush}"
+                                                               VerticalAlignment="Center"/>
+
+                                                    <Border Grid.Column="1"
+                                                            Background="{DynamicResource BgMutedBrush}"
+                                                            BorderBrush="{DynamicResource BorderBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="4"
+                                                            Padding="6,2"
+                                                            VerticalAlignment="Center"
+                                                            Visibility="{Binding IsEdited, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                        <TextBlock Text="Edited"
+                                                                   FontSize="10"
+                                                                   FontWeight="Medium"
+                                                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    </Border>
+                                                </Grid>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="NoteBorder" Property="BorderBrush" Value="{DynamicResource FocusRingBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- EMPTY STATE -->
+                <StackPanel Style="{DynamicResource EmptyState}"
+                          Visibility="{Binding Notes.Count, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=0}">
+                    <materialDesign:PackIcon Style="{DynamicResource EmptyStateIcon}" Kind="NoteOutline"/>
+                    <TextBlock Style="{DynamicResource EmptyStateTitle}" Text="No notes yet"/>
+                    <TextBlock Style="{DynamicResource EmptyStateDescription}"
+                             Text="Start capturing your thoughts and ideas. Your notes will appear here."/>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+
+    </Grid>
+</UserControl>

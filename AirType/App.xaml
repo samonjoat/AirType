@@ -1,0 +1,45 @@
+<Application x:Class="AirType.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AirType"
+             xmlns:converters="clr-namespace:AirType.Converters"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- MaterialDesign resources (must come first for PackIcon and other MD controls) -->
+                <!-- MD resources commented out to prevent startup crash. Dialog will use Path instead of PackIcon. -->
+                <!-- <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" /> -->
+                <!-- <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" /> -->
+                <!-- <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" /> -->
+
+                <!-- App theme and styles -->
+                <ResourceDictionary Source="Themes/LightTheme.xaml"/>
+                <ResourceDictionary Source="Themes/Generic.xaml"/>
+                <ResourceDictionary Source="Styles/ScrollBarStyles.xaml"/>
+                <ResourceDictionary Source="Styles/ButtonStyles.xaml"/>
+                <ResourceDictionary Source="Styles/ControlStyles.xaml"/>
+                <ResourceDictionary Source="Styles/ComboBoxStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Direct content comes after property elements -->
+            <FontFamily x:Key="AppFont">./Fonts/Inter/#Inter</FontFamily>
+
+            <!-- Global Design Tokens -->
+            <sys:Double x:Key="StandardHeight">32</sys:Double>
+
+            <!-- Converters -->
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:StringVisibilityConverter x:Key="StringVisibilityConverter"/>
+            <converters:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter"/>
+            <converters:StringToBooleanConverter x:Key="StringToBooleanConverter"/>
+            <converters:BooleanInverterConverter x:Key="BooleanInverterConverter"/>
+            <converters:BooleanToOpacityConverter x:Key="BooleanToOpacityConverter"/>
+            <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+            <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisConverter"/> <!-- Alias for compatibility -->
+            <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/> <!-- WPF built-in converter -->
+            <converters:DummyConverter x:Key="DummyConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

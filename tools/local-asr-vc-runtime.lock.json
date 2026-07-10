@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "product": "Microsoft Visual C++ 2015-2022 Redistributable (x64)",
+  "version": "14.44.35211",
+  "fileVersion": "14.44.35211.0",
+  "architecture": "x64",
+  "installerUrl": "https://aka.ms/vs/17/release/14.44.35211/VC_redist.x64.exe",
+  "installerSha256": "cc0ff0eb1dc3f5188ae6300faef32bf5beeba4bdd6e8e445a9184072096b713b",
+  "signerSubject": "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+  "wixToolVersion": "6.0.2",
+  "cabinetPath": "packages/vcRuntimeMinimum_amd64/cab1.cab",
+  "cabinetSha256": "640aa6c516c72444523b8fbe034db46ff4e118ed02705340e3ccb62d426ff040",
+  "licenseRelativePath": "licenses/Microsoft-Visual-Cpp-Runtime/license.rtf",
+  "licenseSha256": "8099dc3cf9502c335da829e5c755948a12e3e6de490eb492a99deb673d883d8b",
+  "documentationUrl": "https://learn.microsoft.com/cpp/windows/redistributing-visual-cpp-files",
+  "files": [
+    {
+      "sourceName": "concrt140.dll_amd64",
+      "targetName": "concrt140.dll",
+      "signerSubject": "CN=Microsoft Windows, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "sha256": "2405355f0a58067b258f8df33c327e3a3d716eaac5a3a5aebb757842d85bd376"
+    },
+    {
+      "sourceName": "msvcp140.dll_amd64",
+      "targetName": "msvcp140.dll",
+      "signerSubject": "CN=Microsoft Windows, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "sha256": "0f885b509a685d2bbfa652fed26b5fb31d88fbdab0a978c641d1c7b8aa460aa9"
+    },
+    {
+      "sourceName": "msvcp140_1.dll_amd64",
+      "targetName": "msvcp140_1.dll",
+      "signerSubject": "CN=Microsoft Windows Software Compatibility Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "sha256": "bfad5aef4c63a669e3c140655cdfdf395b6c979b400a447bd5dcb65ed8826c3d"
+    },
+    {
+      "sourceName": "msvcp140_2.dll_amd64",
+      "targetName": "msvcp140_2.dll",
+      "signerSubject": "CN=Microsoft Windows Software Compatibility Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "sha256": "3ea06f0ee098b4823cb79599df3780e7f23cce52c19aac31d2a0d47efe33a5e9"
+    },
+    {
+      "sourceName": "msvcp140_atomic_wait.dll_amd64",
+      "targetName": "msvcp140_atomic_wait.dll",
+      "signerSubject": "CN=Microsoft Windows Software Compatibility Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "sha256": "640b2aefced484d0368eea5bdd06addd0658a3a70a49256e560d6923b404a479"
+    },
+    {
+      "sourceName": "msvcp140_codecvt_ids.dll_amd64",
+      "targetName": "msvcp140_codecvt_ids.dll",
+      "signerSubject": "CN=Microsoft Windows, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "sha256": "f2069a52880ec885ee7f0511186100eb7fada0411a2b4948fafea7735b878a18"
+    },
+    {
+      "sourceName": "vcamp140.dll_amd64",
+      "targetName": "vcamp140.dll",
+      "signerSubject": "CN=Microsoft Windows Software Compatibility Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "sha256": "52af68f35476bd03d7b97752b01bef358ffdda568d150057d6ce809f77c4f704"
+    },
+    {
+      "sourceName": "vccorlib140.dll_amd64",
+      "targetName": "vccorlib140.dll",
+      "signerSubject": "CN=Microsoft Windows Hardware Compatibility Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "sha256": "19839407c3fdbc824e5bce189bf68ddf8097f12ec28b757797ffa0415c144ddd"
+    },
+    {
+      "sourceName": "vcomp140.dll_amd64",
+      "targetName": "vcomp140.dll",
+      "signerSubject": "CN=Microsoft Windows Software Compatibility Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "sha256": "55aba23cdcd6484fbb06f4155b8ca75adfce7a881f10afd0c49457165e677164"
+    },
+    {
+      "sourceName": "vcruntime140.dll_amd64",
+      "targetName": "vcruntime140.dll",
+      "signerSubject": "CN=Microsoft Windows, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "sha256": "d5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066"
+    },
+    {
+      "sourceName": "vcruntime140_1.dll_amd64",
+      "targetName": "vcruntime140_1.dll",
+      "signerSubject": "CN=Microsoft Windows, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "sha256": "1f2d41c4aa5db0bc33ebf7b66d72943a817d7ce6cbe880502a9403823633093f"
+    },
+    {
+      "sourceName": "vcruntime140_threads.dll_amd64",
+      "targetName": "vcruntime140_threads.dll",
+      "signerSubject": "CN=Microsoft Windows Software Compatibility Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "sha256": "219915cf20822f34d5e7c1fdd4e21ae7f3396881096c51036225fb8f84b47afa"
+    }
+  ]
+}

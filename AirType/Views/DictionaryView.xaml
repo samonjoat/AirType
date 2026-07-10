@@ -1,0 +1,248 @@
+<UserControl x:Class="AirType.Views.DictionaryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:AirType.ViewModels"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1000"
+             d:DataContext="{d:DesignInstance viewmodels:DictionaryViewModel}">
+
+    <Grid Background="{DynamicResource BgBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                BorderBrush="{DynamicResource DividerBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="32,28,32,18">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Dictionary" Style="{DynamicResource PageTitle}"/>
+                    <TextBlock Text="Teach AirType the words and corrections it should always apply"
+                               Style="{DynamicResource BodyText}"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <Button Content="Add entry" AutomationProperties.Name="Add dictionary entry" Style="{DynamicResource PrimaryButton}" Command="{Binding AddEntryCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="32,22,32,28">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Margin="0,0,0,18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Style="{DynamicResource SegmentedControlRail}"
+                        HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Content="Vocabulary"
+                                     Style="{DynamicResource TabRadioButton}"
+                                     AutomationProperties.Name="Vocabulary tab"
+                                     IsEnabled="{Binding IsEntryTypeSelectorEnabled}"
+                                     IsChecked="{Binding SelectedTab, Converter={StaticResource StringToBooleanConverter}, ConverterParameter=vocabulary}"/>
+                        <RadioButton Content="Corrections"
+                                     Style="{DynamicResource TabRadioButton}"
+                                     AutomationProperties.Name="Corrections tab"
+                                     IsEnabled="{Binding IsEntryTypeSelectorEnabled}"
+                                     IsChecked="{Binding SelectedTab, Converter={StaticResource StringToBooleanConverter}, ConverterParameter=correction}"/>
+                    </StackPanel>
+                </Border>
+
+                <TextBox Grid.Column="1"
+                         Width="240"
+                         Style="{DynamicResource SearchBox}"
+                         materialDesign:HintAssist.Hint="Search entries"
+                         AutomationProperties.Name="Search dictionary entries"
+                         Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Delay=300}"/>
+            </Grid>
+
+            <Border Grid.Row="1"
+                    Style="{DynamicResource ShadowCard}"
+                    Margin="0,0,0,18"
+                    Visibility="{Binding IsAddEntryPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="{Binding EntryPanelTitle}" Style="{DynamicResource PageHeader}" Margin="0,0,0,16"/>
+
+                    <StackPanel Visibility="{Binding IsVocabularyTabSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Text="Word" Style="{DynamicResource FieldLabel}"/>
+                        <TextBox Style="{DynamicResource CustomTextBox}"
+                                 materialDesign:HintAssist.Hint="Kubernetes"
+                                 Text="{Binding WordInput, UpdateSourceTrigger=PropertyChanged}"
+                                 AutomationProperties.Name="Vocabulary word"
+                                 Margin="0,0,0,14"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{Binding SaveWordButtonText}" AutomationProperties.Name="Save vocabulary word" Style="{DynamicResource PrimaryButton}" Command="{Binding SaveWordCommand}" Margin="0,0,8,0"/>
+                            <Button Content="Cancel" AutomationProperties.Name="Cancel dictionary entry" Command="{Binding CancelCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Visibility="{Binding IsCorrectionTabSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Heard" Style="{DynamicResource FieldLabel}"/>
+                                <TextBox Style="{DynamicResource CustomTextBox}"
+                                         materialDesign:HintAssist.Hint="air type"
+                                         AutomationProperties.Name="Heard text"
+                                         Text="{Binding FromInput, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <materialDesign:PackIcon Grid.Column="1" Kind="ArrowRight" Width="16" Height="16"
+                                                     Foreground="{DynamicResource TextMutedBrush}"
+                                                     VerticalAlignment="Bottom"
+                                                     HorizontalAlignment="Center"
+                                                     Margin="0,0,0,10"/>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Replacement" Style="{DynamicResource FieldLabel}"/>
+                                <TextBox Style="{DynamicResource CustomTextBox}"
+                                         materialDesign:HintAssist.Hint="AirType"
+                                         AutomationProperties.Name="Replacement text"
+                                         Text="{Binding ToInput, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{Binding SaveCorrectionButtonText}" AutomationProperties.Name="Save correction" Style="{DynamicResource PrimaryButton}" Command="{Binding SaveCorrectionCommand}" Margin="0,0,8,0"/>
+                            <Button Content="Cancel" AutomationProperties.Name="Cancel dictionary entry" Command="{Binding CancelCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="2"
+                    Background="{DynamicResource BgPanelBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="14"
+                    ClipToBounds="True">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Background="{DynamicResource BgMutedBrush}" Height="42">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="28"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="72"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Heard" Grid.Column="0" Style="{DynamicResource FieldLabel}" Margin="18,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Replacement" Grid.Column="2" Style="{DynamicResource FieldLabel}" Margin="18,0" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1" Style="{DynamicResource MinimalScrollViewer}" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl x:Name="DictionaryItemsControl"
+                                      ItemsSource="{Binding FilteredEntries}"
+                                      AutomationProperties.Name="Dictionary entries">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{DynamicResource DividerBrush}"
+                                            BorderThickness="0,0,0,1"
+                                            Padding="18,12">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="28"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="72"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding HeardText}"
+                                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                                       Style="{DynamicResource CodeStats}"
+                                                       VerticalAlignment="Center"/>
+                                            <materialDesign:PackIcon Grid.Column="1"
+                                                                     Kind="ArrowRight"
+                                                                     Width="15" Height="15"
+                                                                     Foreground="{DynamicResource TextMutedBrush}"
+                                                                     HorizontalAlignment="Center"
+                                                                     VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding ReplacementText}"
+                                                       Foreground="{DynamicResource TextPrimaryBrush}"
+                                                       FontSize="13"
+                                                       FontWeight="SemiBold"
+                                                       VerticalAlignment="Center"/>
+                                            <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                                                <Button Width="28" Height="28" Padding="0" Margin="0,0,6,0"
+                                                        ToolTip="Edit"
+                                                        AutomationProperties.Name="Edit dictionary entry"
+                                                        Command="{Binding DataContext.EditEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}">
+                                                    <materialDesign:PackIcon Kind="Pencil" Width="15" Height="15"/>
+                                                </Button>
+                                                <Button Width="28" Height="28" Padding="0"
+                                                        ToolTip="Delete"
+                                                        Style="{DynamicResource DangerButton}"
+                                                        AutomationProperties.Name="Delete dictionary entry"
+                                                        Command="{Binding DataContext.DeleteEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}">
+                                                    <materialDesign:PackIcon Kind="TrashCanOutline" Width="15" Height="15"/>
+                                                </Button>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <StackPanel Grid.Row="1"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasItems, ElementName=DictionaryItemsControl}" Value="False">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="No entries"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,4"/>
+                        <TextBlock Text="Add words or corrections to populate this list"
+                                   Style="{DynamicResource BodyText}"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <TextBlock Grid.Row="3"
+                       Text="{Binding StatsText}"
+                       Style="{DynamicResource SmallText}"
+                       Margin="0,12,0,0"/>
+        </Grid>
+    </Grid>
+</UserControl>

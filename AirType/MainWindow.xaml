@@ -1,0 +1,624 @@
+<Window x:Class="AirType.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AirType"
+        xmlns:views="clr-namespace:AirType.Views"
+        xmlns:vm="clr-namespace:AirType.ViewModels"
+        xmlns:converters="clr-namespace:AirType.Converters"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="AirType" 
+        Height="650"
+        Width="840"
+        MinHeight="650"
+        MinWidth="840"
+        ResizeMode="CanResize"
+        Background="{DynamicResource BgBrush}"
+        FontFamily="{StaticResource AppFont}"
+        AutomationProperties.Name="AirType">
+    
+    <Window.Resources>
+        <!-- Sidebar Navigation Button Style -->
+        <Style x:Key="SidebarNavButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Padding" Value="13,9"/>
+            <Setter Property="Margin" Value="0,0,0,2"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <Border x:Name="accentBar"
+                                        Width="3"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Stretch"
+                                        CornerRadius="2"
+                                        Margin="-6,4,0,4"
+                                        Background="{DynamicResource NavActiveBrush}"
+                                        Visibility="Collapsed"/>
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource BgMutedBrush}"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="active">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource NavSelectedBrush}"/>
+                                <Setter TargetName="accentBar" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource BgMutedBrush}"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource FocusRingBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SidebarFooterThemeButton" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource BgPanelBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SidebarFooterPlainButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="11,9"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <Border x:Name="ShellFrame"
+            Background="{DynamicResource BgBrush}"
+            BorderBrush="{DynamicResource WindowBorderBrush}"
+            BorderThickness="1">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="CornerRadius" Value="8"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                        <Setter Property="CornerRadius" Value="0"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition x:Name="TitleBarRow" Height="48"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="{DynamicResource WindowFooterHeight}"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Custom Title Bar -->
+            <Border x:Name="AppTitleBar"
+                    Grid.Row="0"
+                    Background="{DynamicResource BgBrush}"
+                    BorderBrush="{DynamicResource DividerBrush}"
+                    BorderThickness="0,0,0,1"
+                    CornerRadius="8,8,0,0"
+                    IsHitTestVisible="False">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition x:Name="LeftCaptionPaddingColumn" Width="0"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition x:Name="RightCaptionPaddingColumn" Width="0"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="16,0,0,0">
+                        <Border Width="24"
+                                Height="24"
+                                CornerRadius="7"
+                                Margin="0,0,9,0">
+                            <Image Source="{DynamicResource AppLogoImage}"
+                                   Stretch="UniformToFill"
+                                   RenderOptions.BitmapScalingMode="HighQuality"/>
+                        </Border>
+                        <TextBlock Text="AirType"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <!-- Draggable Area -->
+                    <Grid Grid.Column="2" Background="Transparent"/>
+                </Grid>
+            </Border>
+            
+            <!-- Main Content Area -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="SidebarColumn" Width="220"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Sidebar -->
+                <Border Grid.Column="0"
+                        x:Name="Sidebar"
+                        Background="{DynamicResource BgBrush}"
+                        BorderBrush="{DynamicResource DividerBrush}"
+                        BorderThickness="0,0,1,0"
+                        CornerRadius="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- App Logo/Title (Top of Sidebar) -->
+                        <StackPanel x:Name="AppLogoPanel" 
+                                    Grid.Row="0" 
+                                    Orientation="Horizontal" 
+                                    Margin="0"
+                                    Height="0"
+                                    Visibility="Collapsed"
+                                    VerticalAlignment="Center">
+                            <Border x:Name="AppIconBorder"
+                                    Width="44" Height="44"
+                                    Margin="0,0,0,0">
+                                <Viewbox>
+                                    <Canvas Width="512" Height="512">
+                                        <Path Fill="{DynamicResource TextPrimaryBrush}"
+                                              Data="F1 M101,376 L193,136 L245,136 L153,376 Z M337,376 L285,376 L193,136 L245,136 Z M155,280 L283,280 L283,328 L155,328 Z"/>
+                                        <Rectangle Canvas.Left="345" Canvas.Top="98" Width="66" Height="24" RadiusX="4" RadiusY="4" Fill="{DynamicResource AccentBrush}"/>
+                                        <Rectangle Canvas.Left="364" Canvas.Top="104" Width="28" Height="304" RadiusX="4" RadiusY="4" Fill="{DynamicResource AccentBrush}"/>
+                                        <Rectangle Canvas.Left="345" Canvas.Top="390" Width="66" Height="24" RadiusX="4" RadiusY="4" Fill="{DynamicResource AccentBrush}"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </Border>
+                            <TextBlock x:Name="AppTitle"
+                                     Text="AirType"
+                                     Foreground="{DynamicResource TextPrimaryBrush}"
+                                     FontWeight="SemiBold"
+                                     FontSize="20"
+                                     VerticalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <!-- Navigation -->
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      Style="{DynamicResource MinimalScrollViewer}">
+                        <StackPanel x:Name="SidebarNav" Margin="14,16,14,16">
+                            <!-- MAIN Section -->
+                            <TextBlock x:Name="SectionMainHeader"
+                                       Text="MAIN"
+                                       Style="{StaticResource SectionHeader}"
+                                       Margin="6,0,0,8"/>
+                            <!-- History Button -->
+                              <Button x:Name="HistoryButton"
+                                      Style="{StaticResource SidebarNavButton}"
+                                     ToolTip="History"
+                                     AutomationProperties.Name="History"
+                                     Click="NavigateToHistory">
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid x:Name="HistoryIcon"
+                                          Width="18" Height="18"
+                                          Margin="0,0,11,0"
+                                          VerticalAlignment="Center"
+                                          Tag="{DynamicResource TextSecondaryBrush}">
+                                        <Viewbox>
+                                            <Canvas Width="24" Height="24">
+                                                <Path Data="M3,12 A9,9 0 1 0 6,5.3 L3,8"
+                                                      Stroke="{Binding Tag, ElementName=HistoryIcon}"
+                                                      StrokeThickness="2"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round"/>
+                                                <Path Data="M3,4 V8 H7"
+                                                      Stroke="{Binding Tag, ElementName=HistoryIcon}"
+                                                      StrokeThickness="2"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round"/>
+                                                <Path Data="M12,8 V12 L15,14"
+                                                      Stroke="{Binding Tag, ElementName=HistoryIcon}"
+                                                      StrokeThickness="2"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round"/>
+                                            </Canvas>
+                                        </Viewbox>
+                                    </Grid>
+                                    <TextBlock x:Name="HistoryLabel" 
+                                             Text="History" 
+                                             Foreground="{DynamicResource TextSecondaryBrush}"
+                                             FontSize="13"
+                                             FontWeight="SemiBold"
+                                             VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Notes Button -->
+                             <Button x:Name="NotesButton" 
+                                     Style="{StaticResource SidebarNavButton}"
+                                     ToolTip="Notes"
+                                     AutomationProperties.Name="Notes"
+                                     Click="NavigateToNotes">
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid x:Name="NotesIcon"
+                                          Width="18" Height="18"
+                                          Margin="0,0,11,0"
+                                          VerticalAlignment="Center"
+                                          Tag="{DynamicResource TextSecondaryBrush}">
+                                        <Viewbox>
+                                            <Canvas Width="24" Height="24">
+                                                <Path Data="M5,4 H16 L19,7 V20 H5 Z"
+                                                      Fill="Transparent"
+                                                      Stroke="{Binding Tag, ElementName=NotesIcon}"
+                                                      StrokeThickness="2"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round"/>
+                                                <Path Data="M9,9 H15 M9,13 H15 M9,17 H12"
+                                                      Stroke="{Binding Tag, ElementName=NotesIcon}"
+                                                      StrokeThickness="2"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round"/>
+                                            </Canvas>
+                                        </Viewbox>
+                                    </Grid>
+                                    <TextBlock x:Name="NotesLabel" 
+                                             Text="Notes" 
+                                             Foreground="{DynamicResource TextSecondaryBrush}"
+                                             FontSize="13"
+                                             FontWeight="SemiBold"
+                                             VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            
+                            <!-- Dictionary Button -->
+                             <Button x:Name="DictionaryButton"
+                                     Style="{StaticResource SidebarNavButton}"
+                                     ToolTip="Dictionary"
+                                     AutomationProperties.Name="Dictionary"
+                                     Click="NavigateToDictionary">
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid x:Name="DictionaryIcon"
+                                          Width="18" Height="18"
+                                          Margin="0,0,11,0"
+                                          VerticalAlignment="Center"
+                                          Tag="{DynamicResource TextSecondaryBrush}">
+                                        <Viewbox>
+                                            <Canvas Width="24" Height="24">
+                                                <Path Data="M5,5 A2,2 0 0 1 7,3 H19 V19 H7 A2,2 0 0 0 5,21 Z"
+                                                      Fill="Transparent"
+                                                      Stroke="{Binding Tag, ElementName=DictionaryIcon}"
+                                                      StrokeThickness="2"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round"/>
+                                                <Path Data="M5,19 V5"
+                                                      Stroke="{Binding Tag, ElementName=DictionaryIcon}"
+                                                      StrokeThickness="2"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round"/>
+                                            </Canvas>
+                                        </Viewbox>
+                                    </Grid>
+                                    <TextBlock x:Name="DictionaryLabel"
+                                             Text="Dictionary"
+                                             Foreground="{DynamicResource TextSecondaryBrush}"
+                                             FontSize="13"
+                                             FontWeight="SemiBold"
+                                             VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- INSIGHTS Section -->
+                            <TextBlock x:Name="SectionInsightsHeader"
+                                       Text="INSIGHTS"
+                                       Style="{StaticResource SectionHeader}"
+                                       Margin="6,14,0,8"/>
+                            <!-- Statistics Button -->
+                             <Button x:Name="StatisticsButton"
+                                     Style="{StaticResource SidebarNavButton}"
+                                     ToolTip="Statistics"
+                                     AutomationProperties.Name="Statistics"
+                                     Click="NavigateToStatistics">
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid x:Name="StatisticsIcon"
+                                          Width="18" Height="18"
+                                          Margin="0,0,11,0"
+                                          VerticalAlignment="Center"
+                                          Tag="{DynamicResource TextSecondaryBrush}">
+                                        <Viewbox>
+                                            <Canvas Width="24" Height="24">
+                                                <Path Data="M4,19 V5 M4,19 H20"
+                                                      Stroke="{Binding Tag, ElementName=StatisticsIcon}"
+                                                      StrokeThickness="2"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round"/>
+                                                <Path Data="M7,15 L11,11 L14,14 L19,8"
+                                                      Stroke="{Binding Tag, ElementName=StatisticsIcon}"
+                                                      StrokeThickness="2"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round"/>
+                                            </Canvas>
+                                        </Viewbox>
+                                    </Grid>
+                                    <TextBlock x:Name="StatisticsLabel"
+                                             Text="Statistics"
+                                             Foreground="{DynamicResource TextSecondaryBrush}"
+                                             FontSize="13"
+                                             FontWeight="SemiBold"
+                                             VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- SYSTEM Section -->
+                            <TextBlock x:Name="SectionSystemHeader"
+                                       Text="SYSTEM"
+                                       Style="{StaticResource SectionHeader}"
+                                       Margin="6,14,0,8"/>
+                            <!-- Settings Button -->
+                             <Button x:Name="SettingsButton"
+                                     Style="{StaticResource SidebarNavButton}"
+                                     ToolTip="Settings"
+                                     AutomationProperties.Name="Settings"
+                                     Click="NavigateToSettings">
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid x:Name="SettingsIcon"
+                                          Width="18" Height="18"
+                                          Margin="0,0,11,0"
+                                          VerticalAlignment="Center"
+                                          Tag="{DynamicResource TextSecondaryBrush}">
+                                        <Viewbox>
+                                            <Canvas Width="24" Height="24">
+                                                <Path Data="M5,6 H19 M5,12 H19 M5,18 H19"
+                                                      Stroke="{Binding Tag, ElementName=SettingsIcon}"
+                                                      StrokeThickness="2"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round"/>
+                                                <Ellipse Canvas.Left="7" Canvas.Top="4" Width="4" Height="4"
+                                                         Fill="{DynamicResource BgBrush}"
+                                                         Stroke="{Binding Tag, ElementName=SettingsIcon}"
+                                                         StrokeThickness="2"/>
+                                                <Ellipse Canvas.Left="13" Canvas.Top="10" Width="4" Height="4"
+                                                         Fill="{DynamicResource BgBrush}"
+                                                         Stroke="{Binding Tag, ElementName=SettingsIcon}"
+                                                         StrokeThickness="2"/>
+                                                <Ellipse Canvas.Left="6" Canvas.Top="16" Width="4" Height="4"
+                                                         Fill="{DynamicResource BgBrush}"
+                                                         Stroke="{Binding Tag, ElementName=SettingsIcon}"
+                                                         StrokeThickness="2"/>
+                                            </Canvas>
+                                        </Viewbox>
+                                    </Grid>
+                                    <TextBlock x:Name="SettingsLabel" 
+                                             Text="Settings" 
+                                             Foreground="{DynamicResource TextSecondaryBrush}"
+                                             FontSize="13"
+                                             FontWeight="SemiBold"
+                                             VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        </ScrollViewer>
+                        
+                        <!-- Sidebar Footer -->
+                        <StackPanel x:Name="SidebarFooter" Grid.Row="2" Margin="14,0,14,0">
+                            <!-- Theme Toggle -->
+                             <Button x:Name="ThemeToggleBorder"
+                                     Style="{StaticResource SidebarFooterThemeButton}"
+                                     ToolTip="Toggle theme"
+                                     AutomationProperties.Name="Toggle theme"
+                                     Click="ToggleTheme">
+                                <Grid x:Name="ThemeToggleGrid">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition x:Name="ThemeTextColumn" Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                             x:Name="ThemeText" 
+                                             Text="Theme"
+                                             Foreground="{DynamicResource TextSecondaryBrush}"
+                                             FontSize="13"
+                                             FontWeight="SemiBold"
+                                             VerticalAlignment="Center"/>
+
+                                    <Border Grid.Column="1"
+                                            Background="{DynamicResource BgBrush}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="7"
+                                            Width="24" Height="24">
+                                        <materialDesign:PackIcon x:Name="ThemeIcon" 
+                                                               Kind="WhiteBalanceSunny"
+                                                               Width="14" Height="14"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
+                                                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    </Border>
+                                </Grid>
+                            </Button>
+                            
+                            <!-- Collapse Toggle -->
+                             <Button x:Name="CollapseButton"
+                                     Style="{StaticResource SidebarFooterPlainButton}"
+                                     ToolTip="Collapse sidebar"
+                                     AutomationProperties.Name="Collapse or expand sidebar"
+                                     Click="ToggleSidebar">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon x:Name="CollapseIcon"
+                                                           Kind="ChevronLeft" 
+                                                           Width="18" Height="18"
+                                                           Margin="0,0,11,0"
+                                                           VerticalAlignment="Center"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    <TextBlock x:Name="CollapseLabel" 
+                                             Text="Collapse" 
+                                             Foreground="{DynamicResource TextSecondaryBrush}"
+                                             FontSize="13"
+                                             FontWeight="SemiBold"
+                                             VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                
+                <!-- Main Content -->
+                <Border Grid.Column="1"
+                        Background="{DynamicResource BgBrush}"
+                        CornerRadius="0"
+                        Margin="0">
+                    <Grid x:Name="ContentClipGrid" SizeChanged="ContentClipGrid_SizeChanged">
+                        <ContentPresenter x:Name="ContentArea"/>
+                    </Grid>
+                </Border>
+
+                <!-- Toast Notification Overlay (10.3) -->
+                <ItemsControl Grid.Column="1"
+                             x:Name="ToastStack"
+                             ItemsSource="{Binding Toasts, Source={x:Static services:ToastService.Instance}}"
+                             VerticalAlignment="Bottom"
+                             HorizontalAlignment="Right"
+                             Margin="0,0,24,24"
+                             Panel.ZIndex="1000"
+                             xmlns:services="clr-namespace:AirType.Services">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="ToastBorder" Style="{StaticResource ToastFrame}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border x:Name="ToastIconFrame"
+                                            Width="28"
+                                            Height="28"
+                                            CornerRadius="{DynamicResource ButtonCornerRadius}"
+                                            Background="{DynamicResource BgMutedBrush}"
+                                            VerticalAlignment="Top">
+                                        <materialDesign:PackIcon x:Name="ToastIcon"
+                                                                 Kind="{Binding IconKind}"
+                                                                 Width="16"
+                                                                 Height="16"
+                                                                 Foreground="{DynamicResource AccentBrush}"
+                                                                 HorizontalAlignment="Center"
+                                                                 VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1" Margin="10,0,10,0">
+                                        <TextBlock Text="{Binding Title}"
+                                                   Style="{StaticResource ToastTitleStyle}"
+                                                   Visibility="{Binding Title, Converter={StaticResource StringVisibilityConverter}}"/>
+                                        <TextBlock Text="{Binding Message}"
+                                                   Style="{StaticResource BodyText}"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <Button Grid.Column="2"
+                                            Width="26"
+                                            Height="26"
+                                            VerticalAlignment="Top"
+                                            Style="{DynamicResource IconButtonSubtle}"
+                                            AutomationProperties.Name="Dismiss notification"
+                                            Command="{Binding Source={x:Static services:ToastService.Instance}, Path=DismissCommand}"
+                                            CommandParameter="{Binding}">
+                                        <materialDesign:PackIcon Kind="Close"
+                                                                 Width="14"
+                                                                 Height="14"
+                                                                 VerticalAlignment="Center"
+                                                                 HorizontalAlignment="Center"/>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Type}" Value="Success">
+                                    <Setter TargetName="ToastBorder" Property="Style" Value="{StaticResource ToastSuccess}"/>
+                                    <Setter TargetName="ToastIcon" Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Type}" Value="Warning">
+                                    <Setter TargetName="ToastBorder" Property="Style" Value="{StaticResource ToastWarning}"/>
+                                    <Setter TargetName="ToastIcon" Property="Foreground" Value="{DynamicResource WarningBrush}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Type}" Value="Error">
+                                    <Setter TargetName="ToastBorder" Property="Style" Value="{StaticResource ToastError}"/>
+                                    <Setter TargetName="ToastIcon" Property="Foreground" Value="{DynamicResource ErrorBrush}"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+
+            <!-- Bottom shell bar keeps page content from touching the window edge. -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource BgBrush}"
+                    BorderBrush="{DynamicResource DividerBrush}"
+                    BorderThickness="0,1,0,0"/>
+        </Grid>
+    </Border>
+</Window>

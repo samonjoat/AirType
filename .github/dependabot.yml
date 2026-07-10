@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ['*']
+
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      nuget-production:
+        dependency-type: production
+        patterns: ['*']
+      nuget-development:
+        dependency-type: development
+        patterns: ['*']
+
+  - package-ecosystem: pip
+    directory: /AirType.LocalAsrWorker
+    schedule:
+      interval: weekly
+    groups:
+      python-runtime:
+        patterns: ['*']
