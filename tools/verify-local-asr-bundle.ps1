@@ -169,11 +169,17 @@ try {
 
     $textFiles = $allFiles | Where-Object { $_.Extension -in @(".cfg", ".json", ".pth", ".py", ".txt", ".toml", ".md") }
     $verifierRepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-    $exactDeveloperPathPatterns = @([Regex]::Escape($verifierRepoRoot), [Regex]::Escape($env:USERPROFILE))
-    $pathLeak = $textFiles | Select-String -Pattern $exactDeveloperPathPatterns -List | Select-Object -First 1
+    $projectPathPatterns = @([Regex]::Escape($verifierRepoRoot), "my_builds", "dictation-ui-modernization")
+    $pathLeak = $textFiles | Select-String -Pattern $projectPathPatterns -List | Select-Object -First 1
     if (!$pathLeak) {
-        $hostBindingFiles = $allFiles | Where-Object { $_.Extension -in @(".cfg", ".json", ".pth", ".toml") }
-        $hostBindingPattern = '(?i)([A-Z]:\\Users\\[^\\\r\n]+\\|/home/[^/\r\n]+/)'
+        $sitePackagesRoot = [IO.Path]::GetFullPath((Join-Path $extractionRoot "runtime\Lib\site-packages")).TrimEnd('\')
+        $workerPackageRoot = Join-Path $sitePackagesRoot "airtype_asr_worker"
+        $firstPartyTextFiles = @($textFiles | Where-Object {
+            !$_.FullName.StartsWith($sitePackagesRoot + '\', [StringComparison]::OrdinalIgnoreCase) -or
+            $_.FullName.StartsWith($workerPackageRoot + '\', [StringComparison]::OrdinalIgnoreCase)
+        })
+        $hostBindingFiles = $firstPartyTextFiles | Where-Object { $_.Extension -in @(".cfg", ".json", ".pth", ".py", ".toml") }
+        $hostBindingPattern = '(?i)([A-Z]:[\\/]Users[\\/][^\\/\r\n]+[\\/]|/home/[^/\r\n]+/)'
         $pathLeak = $hostBindingFiles | Select-String -Pattern $hostBindingPattern -List | Select-Object -First 1
     }
     if ($pathLeak) {

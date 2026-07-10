@@ -62,6 +62,8 @@ public sealed class ReleasePackagingSourceTests
         Assert.Contains("python312.dll", script);
         Assert.Contains("Get-PeMachine", script);
         Assert.Contains("Get-AuthenticodeSignature", script);
+        Assert.Contains("$firstPartyTextFiles", script);
+        Assert.Contains("$sitePackagesRoot", script);
         Assert.Contains("AIRTYPE_STORAGE_ROOT", script);
         Assert.Contains("fresh-storage-root", script);
         Assert.Contains("StartupTimeoutSeconds = 20", script);

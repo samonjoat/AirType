@@ -143,6 +143,8 @@ public sealed class LocalAsrRuntimePreparationScriptTests
         Assert.Contains("Visual C++ runtime file checksum mismatch", script);
         Assert.Contains("Visual C++ runtime file version mismatch", script);
         Assert.DoesNotContain("$runtimeFileSignature", script);
+        Assert.Contains("$firstPartyTextFiles", script);
+        Assert.Contains("$sitePackagesRoot", script);
         Assert.Contains("Microsoft-Visual-Cpp-Runtime", script);
         Assert.Contains("sourceCommit", script);
         Assert.Contains("source date must be normalized to UTC", script);

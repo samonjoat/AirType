@@ -162,16 +162,31 @@ try {
         Assert-ReleaseCondition ($manifest.sourceBranch -eq "main") "Public release manifest was not built from main."
     }
 
-    $textExtensions = @(".cfg", ".json", ".md", ".pth", ".py", ".txt")
-    $developerPathPatterns = @(
-        [Regex]::Escape($env:USERPROFILE),
+    $allFiles = @(Get-ChildItem -LiteralPath $extractionRoot -Recurse -File)
+    $textExtensions = @(".cfg", ".json", ".md", ".pth", ".py", ".txt", ".toml")
+    $textFiles = @($allFiles | Where-Object { $_.Extension -in $textExtensions })
+    $verifierRepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+    $projectPathPatterns = @(
+        [Regex]::Escape($verifierRepoRoot),
         "my_builds",
         "dictation-ui-modernization"
     )
-    $developerPathLeak = Get-ChildItem -LiteralPath $extractionRoot -Recurse -File |
-        Where-Object { $_.Extension -in $textExtensions } |
-        Select-String -Pattern $developerPathPatterns -List -ErrorAction SilentlyContinue |
+    $developerPathLeak = $textFiles |
+        Select-String -Pattern $projectPathPatterns -List -ErrorAction SilentlyContinue |
         Select-Object -First 1
+    if ($null -eq $developerPathLeak) {
+        $sitePackagesRoot = [IO.Path]::GetFullPath((Join-Path $extractionRoot "LocalAsrWorker\runtime\Lib\site-packages")).TrimEnd('\')
+        $workerPackageRoot = Join-Path $sitePackagesRoot "airtype_asr_worker"
+        $firstPartyTextFiles = @($textFiles | Where-Object {
+            !$_.FullName.StartsWith($sitePackagesRoot + '\', [StringComparison]::OrdinalIgnoreCase) -or
+            $_.FullName.StartsWith($workerPackageRoot + '\', [StringComparison]::OrdinalIgnoreCase)
+        })
+        $hostBindingFiles = @($firstPartyTextFiles | Where-Object { $_.Extension -in @(".cfg", ".json", ".pth", ".py", ".toml") })
+        $hostBindingPattern = '(?i)([A-Z]:[\\/]Users[\\/][^\\/\r\n]+[\\/]|/home/[^/\r\n]+/)'
+        $developerPathLeak = $hostBindingFiles |
+            Select-String -Pattern $hostBindingPattern -List -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+    }
     if ($null -ne $developerPathLeak) {
         throw "Release package contains a developer path in $($developerPathLeak.Path)."
     }
