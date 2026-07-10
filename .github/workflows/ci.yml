@@ -58,7 +58,7 @@ jobs:
 
       - name: Clean
         shell: pwsh
-        run: dotnet clean .\AirType.sln --no-restore --verbosity minimal
+        run: dotnet clean .\AirType.sln --verbosity minimal
 
       - name: Build
         shell: pwsh

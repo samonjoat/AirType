@@ -35,6 +35,7 @@ public sealed class GitHubAutomationSourceTests
         string workflow = ReadWorkflow("ci.yml");
 
         Assert.Contains("dotnet clean .\\AirType.sln", workflow);
+        Assert.DoesNotContain("dotnet clean .\\AirType.sln --no-restore", workflow);
         Assert.Contains("dotnet build .\\AirType.sln", workflow);
         Assert.Contains("dotnet test .\\AirType.Tests", workflow);
         Assert.Contains("verify-dco.ps1", workflow);
