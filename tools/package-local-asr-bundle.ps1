@@ -231,11 +231,25 @@ if ((Test-Path (Join-Path $stagedRuntimeRoot "Lib\site-packages\av")) -or
     throw "Packaging refused the unused PyAV/FFmpeg codec stack."
 }
 
-$hostPathPatterns = @([Regex]::Escape($repoRoot), [Regex]::Escape($env:USERPROFILE))
-$leakedPath = Get-ChildItem -LiteralPath $stagingRoot -Recurse -File |
-    Where-Object { $_.Extension -in @(".cfg", ".json", ".pth", ".py", ".txt") } |
-    Select-String -Pattern $hostPathPatterns -List |
+$allStagedFiles = @(Get-ChildItem -LiteralPath $stagingRoot -Recurse -File)
+$textFiles = @($allStagedFiles | Where-Object { $_.Extension -in @(".cfg", ".json", ".md", ".pth", ".py", ".txt", ".toml") })
+$projectPathPatterns = @([Regex]::Escape($repoRoot), "my_builds", "dictation-ui-modernization")
+$leakedPath = $textFiles |
+    Select-String -Pattern $projectPathPatterns -List |
     Select-Object -First 1
+if (!$leakedPath) {
+    $sitePackagesRoot = [IO.Path]::GetFullPath((Join-Path $stagedRuntimeRoot "Lib\site-packages")).TrimEnd('\')
+    $workerPackageRoot = Join-Path $sitePackagesRoot "airtype_asr_worker"
+    $firstPartyTextFiles = @($textFiles | Where-Object {
+        !$_.FullName.StartsWith($sitePackagesRoot + '\', [StringComparison]::OrdinalIgnoreCase) -or
+        $_.FullName.StartsWith($workerPackageRoot + '\', [StringComparison]::OrdinalIgnoreCase)
+    })
+    $hostBindingFiles = $firstPartyTextFiles | Where-Object { $_.Extension -in @(".cfg", ".json", ".pth", ".py", ".toml") }
+    $hostBindingPattern = '(?i)([A-Z]:[\\/]Users[\\/][^\\/\r\n]+[\\/]|/home/[^/\r\n]+/)'
+    $leakedPath = $hostBindingFiles |
+        Select-String -Pattern $hostBindingPattern -List |
+        Select-Object -First 1
+}
 if ($leakedPath) {
     throw "Packaging refused developer path leakage in $($leakedPath.Path)."
 }

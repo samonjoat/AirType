@@ -102,6 +102,8 @@ public sealed class LocalAsrRuntimePreparationScriptTests
         Assert.Contains("THIRD_PARTY_NOTICES.md", script);
         Assert.Contains("THIRD_PARTY_LICENSES\\manifest.json", script);
         Assert.Contains("visual-cpp-runtime.json", script);
+        Assert.Contains("$firstPartyTextFiles", script);
+        Assert.Contains("$sitePackagesRoot", script);
         Assert.Contains("New-DeterministicZip", script);
         Assert.Contains("sourceCommit = $sourceCommit", script);
         Assert.Contains("createdUtc = $sourceDateUtc", script);
