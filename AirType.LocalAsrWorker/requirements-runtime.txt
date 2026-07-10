@@ -20,7 +20,7 @@ requests==2.34.2
 setuptools==83.0.0
 sympy==1.14.0
 tokenizers==0.21.4
-tqdm==4.67.3
+tqdm==4.68.4
 typing-extensions==4.16.0
 urllib3==2.7.0
 websockets==16.0
