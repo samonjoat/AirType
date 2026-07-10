@@ -73,8 +73,12 @@ public sealed class GitHubAutomationSourceTests
         Assert.Contains("pip-audit==2.10.1", workflow);
         Assert.Contains("audit-dependencies.ps1", workflow);
         Assert.Contains("gitleaks/gitleaks-action@", workflow);
+        Assert.Contains("dotnet restore $projectPath", auditScript);
         Assert.Contains("--vulnerable --include-transitive --format json", auditScript);
         Assert.Contains("python-vulnerabilities.json", auditScript);
+        Assert.True(
+            auditScript.IndexOf("dotnet restore $projectPath", StringComparison.Ordinal) <
+            auditScript.IndexOf("dotnet list $projectPath package", StringComparison.Ordinal));
     }
 
     [Fact]

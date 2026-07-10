@@ -22,8 +22,16 @@ $requirementsPath = Join-Path $repoRoot "AirType.LocalAsrWorker\requirements-run
 $nugetReportPath = Join-Path $fullReportRoot "nuget-vulnerabilities.json"
 $pythonReportPath = Join-Path $fullReportRoot "python-vulnerabilities.json"
 
+& dotnet restore $projectPath --verbosity minimal
+if ($LASTEXITCODE -ne 0) {
+    throw "NuGet restore failed before the vulnerability audit."
+}
+
 $nugetOutput = @(& dotnet list $projectPath package --vulnerable --include-transitive --format json)
 if ($LASTEXITCODE -ne 0) {
+    if ($nugetOutput.Count -gt 0) {
+        ($nugetOutput -join "`n") | Write-Error
+    }
     throw "NuGet vulnerability audit command failed."
 }
 $nugetJson = $nugetOutput -join "`n"
