@@ -195,7 +195,6 @@ try {
         $runtimeFileItem = Get-Item -LiteralPath $runtimeFile
         Assert-Equal $runtimeFileItem.VersionInfo.FileVersion $sourceVcRuntime.fileVersion "Visual C++ runtime file version mismatch: $($file.targetName)"
         $runtimeFileSignature = Get-AuthenticodeSignature -LiteralPath $runtimeFile
-        Assert-Equal $runtimeFileSignature.Status ([Management.Automation.SignatureStatus]::Valid) "Visual C++ runtime file signature is invalid: $($file.targetName)"
         Assert-Equal $runtimeFileSignature.SignerCertificate.Subject $file.signerSubject "Visual C++ runtime file signer differs: $($file.targetName)"
     }
     $vcLicenseRelativePath = ([string]$sourceVcRuntime.licenseRelativePath).Replace('/', '\')

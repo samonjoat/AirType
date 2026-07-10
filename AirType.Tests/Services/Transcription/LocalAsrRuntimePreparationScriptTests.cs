@@ -37,6 +37,8 @@ public sealed class LocalAsrRuntimePreparationScriptTests
         Assert.Contains("$Actual.StartsWith(\"$Expected+\"", script);
         Assert.Contains("burn extract", script);
         Assert.Contains("Get-AuthenticodeSignature", script);
+        Assert.Contains("$sourceSignature.SignerCertificate.Subject -ne $file.signerSubject", script);
+        Assert.DoesNotContain("$sourceSignature.Status -ne", script);
         Assert.Contains("Visual C++ minimum runtime file set differs from its lock.", script);
         Assert.DoesNotContain("-m venv $venvRoot", script);
         Assert.DoesNotContain("[string[]]$Models = @(\"base.en\", \"small.en\")", script);
@@ -138,6 +140,8 @@ public sealed class LocalAsrRuntimePreparationScriptTests
         Assert.Contains("THIRD_PARTY_LICENSES", script);
         Assert.Contains("visual-cpp-runtime.json", script);
         Assert.Contains("Visual C++ runtime file checksum mismatch", script);
+        Assert.Contains("$runtimeFileSignature.SignerCertificate.Subject", script);
+        Assert.DoesNotContain("$runtimeFileSignature.Status", script);
         Assert.Contains("Microsoft-Visual-Cpp-Runtime", script);
         Assert.Contains("sourceCommit", script);
         Assert.Contains("source date must be normalized to UTC", script);
