@@ -21,6 +21,7 @@ public sealed class GitHubAutomationSourceTests
             Assert.Contains("permissions:\n  contents: read", Normalize(workflow));
             Assert.DoesNotContain("pull_request_target", workflow);
             Assert.DoesNotContain("contents: write", workflow);
+            Assert.DoesNotContain("pull-requests: write", workflow);
 
             foreach (Match match in Regex.Matches(workflow, @"uses:\s+[^\s@]+@([^\s#]+)"))
             {
@@ -73,6 +74,8 @@ public sealed class GitHubAutomationSourceTests
         Assert.Contains("pip-audit==2.10.1", workflow);
         Assert.Contains("audit-dependencies.ps1", workflow);
         Assert.Contains("gitleaks/gitleaks-action@", workflow);
+        Assert.Contains("pull-requests: read", workflow);
+        Assert.Contains("GITLEAKS_ENABLE_COMMENTS: 'false'", workflow);
         Assert.Contains("dotnet restore $projectPath", auditScript);
         Assert.Contains("--vulnerable --include-transitive --format json", auditScript);
         Assert.Contains("python-vulnerabilities.json", auditScript);
