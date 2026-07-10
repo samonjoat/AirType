@@ -58,8 +58,12 @@ function Get-PinnedWixExecutable {
             Remove-Item -LiteralPath $toolRoot -Recurse -Force
         }
         New-Item -ItemType Directory -Force -Path $toolRoot | Out-Null
-        & dotnet tool install wix --tool-path $toolRoot --version $Version --no-cache
-        if ($LASTEXITCODE -ne 0) {
+        $installOutput = @(& dotnet tool install wix --tool-path $toolRoot --version $Version --no-cache)
+        $installExitCode = $LASTEXITCODE
+        foreach ($line in $installOutput) {
+            Write-Host $line
+        }
+        if ($installExitCode -ne 0) {
             throw "Failed to install pinned WiX Toolset $Version."
         }
     }

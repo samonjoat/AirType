@@ -29,6 +29,9 @@ public sealed class LocalAsrRuntimePreparationScriptTests
         Assert.Contains("AIRTYPE_PCM_ONLY_SHIM", script);
         Assert.Contains("Official Python embeddable package checksum mismatch.", script);
         Assert.Contains("local-asr-vc-runtime.lock.json", script);
+        Assert.Contains("$installOutput = @(& dotnet tool install wix", script);
+        Assert.Contains("$installExitCode = $LASTEXITCODE", script);
+        Assert.Contains("Write-Host $line", script);
         Assert.Contains("burn extract", script);
         Assert.Contains("Get-AuthenticodeSignature", script);
         Assert.Contains("Visual C++ minimum runtime file set differs from its lock.", script);
