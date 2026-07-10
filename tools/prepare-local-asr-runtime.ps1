@@ -156,14 +156,13 @@ function Install-PinnedVisualCppRuntime {
         if ($actualFiles.Count -ne @($lock.files).Count) {
             throw "Visual C++ minimum runtime file set differs from its lock."
         }
+        # The signed installer anchors trust; cabinet and file hashes pin its exact extracted payload.
         foreach ($file in $lock.files) {
             $sourceFile = Join-Path $expandedRoot $file.sourceName
             Assert-FileSha256 -Path $sourceFile -Expected $file.sha256 -Description "Visual C++ runtime file $($file.sourceName)"
             $sourceItem = Get-Item -LiteralPath $sourceFile
-            $sourceSignature = Get-AuthenticodeSignature -LiteralPath $sourceFile
-            if ($sourceItem.VersionInfo.FileVersion -ne $lock.fileVersion -or
-                $sourceSignature.SignerCertificate.Subject -ne $file.signerSubject) {
-                throw "Visual C++ runtime file signer/version validation failed: $($file.sourceName)"
+            if ($sourceItem.VersionInfo.FileVersion -ne $lock.fileVersion) {
+                throw "Visual C++ runtime file version validation failed: $($file.sourceName)"
             }
             Copy-Item -LiteralPath $sourceFile -Destination (Join-Path $DestinationRoot $file.targetName) -Force
         }

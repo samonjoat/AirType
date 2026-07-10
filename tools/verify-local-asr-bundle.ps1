@@ -194,8 +194,6 @@ try {
         Assert-Equal $runtimeFileHash $file.sha256 "Visual C++ runtime file checksum mismatch: $($file.targetName)"
         $runtimeFileItem = Get-Item -LiteralPath $runtimeFile
         Assert-Equal $runtimeFileItem.VersionInfo.FileVersion $sourceVcRuntime.fileVersion "Visual C++ runtime file version mismatch: $($file.targetName)"
-        $runtimeFileSignature = Get-AuthenticodeSignature -LiteralPath $runtimeFile
-        Assert-Equal $runtimeFileSignature.SignerCertificate.Subject $file.signerSubject "Visual C++ runtime file signer differs: $($file.targetName)"
     }
     $vcLicenseRelativePath = ([string]$sourceVcRuntime.licenseRelativePath).Replace('/', '\')
     $vcLicensePath = Join-Path (Join-Path $extractionRoot "runtime") $vcLicenseRelativePath
