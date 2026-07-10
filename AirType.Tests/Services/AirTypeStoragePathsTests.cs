@@ -13,9 +13,11 @@ public class AirTypeStoragePathsTests
     public void Canonical_path_owners_derive_from_canonical_root()
     {
         string canonicalRoot = AirTypeStoragePaths.CanonicalRoot;
-        string expectedTestRootPrefix = Path.Combine(Path.GetTempPath(), "AirTypeTestRun_");
+        string? configuredRoot = Environment.GetEnvironmentVariable(
+            AirTypeStoragePaths.ProcessStorageRootEnvironmentVariable);
 
-        Assert.StartsWith(expectedTestRootPrefix, canonicalRoot, StringComparison.OrdinalIgnoreCase);
+        Assert.False(string.IsNullOrWhiteSpace(configuredRoot));
+        Assert.Equal(Path.GetFullPath(configuredRoot), canonicalRoot);
         Assert.Equal(Path.Combine(canonicalRoot, "Logs", "App"), AirTypeStoragePaths.GetCanonicalPath("Logs", "App"));
         Assert.Equal(Path.Combine(canonicalRoot, "dictation.db"), DatabaseInitializer.DbPath);
 

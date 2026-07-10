@@ -23,7 +23,7 @@ Run from the repository root:
 ```powershell
 dotnet clean .\AirType\AirType.csproj
 dotnet build .\AirType\AirType.csproj
-dotnet test .\AirType.Tests\AirType.Tests.csproj --no-restore
+.\tools\test.ps1 -NoRestore
 
 Set-Location .\AirType.LocalAsrWorker
 python -m pytest .\tests -q

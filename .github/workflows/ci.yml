@@ -58,15 +58,15 @@ jobs:
 
       - name: Clean
         shell: pwsh
-        run: dotnet clean .\AirType.sln --verbosity minimal
+        run: dotnet clean .\AirType\AirType.csproj --verbosity minimal
 
       - name: Build
         shell: pwsh
-        run: dotnet build .\AirType.sln --no-restore --verbosity minimal
+        run: dotnet build .\AirType\AirType.csproj --no-restore --verbosity minimal
 
       - name: Run xUnit tests
         shell: pwsh
-        run: dotnet test .\AirType.Tests\AirType.Tests.csproj --no-build --verbosity minimal
+        run: .\tools\test.ps1 -NoRestore
 
       - name: Run Local ASR worker tests
         shell: pwsh

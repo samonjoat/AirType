@@ -48,6 +48,7 @@ public sealed class PublicDocumentationSourceTests
         Assert.Contains("does not", readme);
         Assert.Contains("grant rights to the AirType name", readme);
         Assert.Contains("docs/ARCHITECTURE.md", readme);
+        Assert.Contains(".\\tools\\test.ps1", readme);
         Assert.DoesNotContain("design-assets/", readme);
         Assert.DoesNotContain("implementation-plans/", readme);
         Assert.DoesNotContain("PROJECT_LOG.md", readme);
@@ -65,6 +66,7 @@ public sealed class PublicDocumentationSourceTests
         Assert.Contains("SignPath Foundation", releasing);
         Assert.Contains("Do not label it stable", releasing);
         Assert.Contains("build-public-snapshot.ps1", releasing);
+        Assert.Contains(".\\tools\\test.ps1", releasing);
         Assert.DoesNotContain("AGENTS.md", releasing);
         Assert.DoesNotContain("implementation-plans", releasing);
     }

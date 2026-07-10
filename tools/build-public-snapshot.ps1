@@ -262,7 +262,8 @@ foreach ($requiredPath in @(
     "AirType/Fonts/Inter/OFL.txt",
     "AirType/Sounds/PROVENANCE.md",
     "tools/build-release.ps1",
-    "tools/build-public-snapshot.ps1"
+    "tools/build-public-snapshot.ps1",
+    "tools/test.ps1"
 )) {
     if (!(Test-Path -LiteralPath (Join-Path $outputRoot $requiredPath) -PathType Leaf)) {
         throw "Required public snapshot file is missing: $requiredPath"
@@ -275,15 +276,19 @@ if (Test-Path -LiteralPath (Join-Path $outputRoot ".git")) {
 
 if (!$SkipValidation) {
     Invoke-CheckedCommand -FilePath "dotnet" `
-        -Arguments @("clean", ".\AirType.sln", "--verbosity", "minimal") `
+        -Arguments @("restore", ".\AirType.sln") `
+        -WorkingDirectory $outputRoot `
+        -FailureMessage "Public snapshot restore failed."
+    Invoke-CheckedCommand -FilePath "dotnet" `
+        -Arguments @("clean", ".\AirType\AirType.csproj", "--verbosity", "minimal") `
         -WorkingDirectory $outputRoot `
         -FailureMessage "Public snapshot clean failed."
     Invoke-CheckedCommand -FilePath "dotnet" `
-        -Arguments @("build", ".\AirType.sln", "--verbosity", "minimal") `
+        -Arguments @("build", ".\AirType\AirType.csproj", "--no-restore", "--verbosity", "minimal") `
         -WorkingDirectory $outputRoot `
         -FailureMessage "Public snapshot build failed."
-    Invoke-CheckedCommand -FilePath "dotnet" `
-        -Arguments @("test", ".\AirType.Tests\AirType.Tests.csproj", "--no-build", "--verbosity", "minimal") `
+    Invoke-CheckedCommand -FilePath "pwsh" `
+        -Arguments @("-NoProfile", "-File", ".\tools\test.ps1", "-NoRestore") `
         -WorkingDirectory $outputRoot `
         -FailureMessage "Public snapshot xUnit tests failed."
     Invoke-CheckedCommand -FilePath "python" `

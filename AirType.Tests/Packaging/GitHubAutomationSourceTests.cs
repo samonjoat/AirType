@@ -34,14 +34,34 @@ public sealed class GitHubAutomationSourceTests
     {
         string workflow = ReadWorkflow("ci.yml");
 
-        Assert.Contains("dotnet clean .\\AirType.sln", workflow);
-        Assert.DoesNotContain("dotnet clean .\\AirType.sln --no-restore", workflow);
-        Assert.Contains("dotnet build .\\AirType.sln", workflow);
-        Assert.Contains("dotnet test .\\AirType.Tests", workflow);
+        Assert.Contains("dotnet clean .\\AirType\\AirType.csproj", workflow);
+        Assert.Contains("dotnet build .\\AirType\\AirType.csproj", workflow);
+        Assert.Contains(".\\tools\\test.ps1 -NoRestore", workflow);
+        Assert.DoesNotContain("dotnet test", workflow);
         Assert.Contains("verify-dco.ps1", workflow);
         Assert.Contains("--verify-production", workflow);
         Assert.Contains("build-public-snapshot.ps1", workflow);
         Assert.Contains("python -m pytest", workflow);
+    }
+
+    [Fact]
+    public void TestRunner_IsolatesStorageAndDisablesWindowsAppSdkStartup()
+    {
+        string script = File.ReadAllText(Path.Combine(RepoRoot, "tools", "test.ps1"));
+        string testProject = File.ReadAllText(
+            Path.Combine(RepoRoot, "AirType.Tests", "AirType.Tests.csproj"));
+        string testInitializer = File.ReadAllText(
+            Path.Combine(RepoRoot, "AirType.Tests", "TestStorageIsolation.cs"));
+
+        Assert.Contains("AIRTYPE_STORAGE_ROOT", script);
+        Assert.Contains("[IO.Path]::GetTempPath()", script);
+        Assert.Contains("Refusing to remove test storage outside", script);
+        Assert.Contains("WindowsAppSdkBootstrapInitialize=false", script);
+        Assert.Contains("WindowsAppSdkUndockedRegFreeWinRTInitialize=false", script);
+        Assert.Contains("--blame-hang-timeout", script);
+        Assert.Contains("<WindowsAppSdkBootstrapInitialize>false", testProject);
+        Assert.Contains("<WindowsAppSdkUndockedRegFreeWinRTInitialize>false", testProject);
+        Assert.DoesNotContain("ModuleInitializer", testInitializer);
     }
 
     [Fact]

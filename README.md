@@ -56,7 +56,7 @@ From the repository root:
 ```powershell
 dotnet clean .\AirType\AirType.csproj
 dotnet build .\AirType\AirType.csproj
-dotnet test .\AirType.Tests\AirType.Tests.csproj
+.\tools\test.ps1 -NoRestore
 dotnet run --project .\AirType\AirType.csproj
 ```
 

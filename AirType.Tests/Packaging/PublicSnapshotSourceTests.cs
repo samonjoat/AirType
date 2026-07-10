@@ -30,6 +30,8 @@ public sealed class PublicSnapshotSourceTests
         Assert.Contains("Public snapshot must not contain Git history or refs", script);
         Assert.Contains("Potential credential pattern", script);
         Assert.Contains("--verify-production", script);
+        Assert.Contains("tools/test.ps1", script);
+        Assert.Contains("@(\"restore\", \".\\AirType.sln\")", script);
         Assert.Contains("Clear-GeneratedValidationArtifacts", script);
         Assert.Contains("Generated validation directories remain", script);
     }
