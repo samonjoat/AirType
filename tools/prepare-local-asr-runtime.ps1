@@ -40,13 +40,23 @@ function Assert-FileSha256 {
     }
 }
 
+function Test-PinnedWixVersion {
+    param(
+        [Parameter(Mandatory)] [string]$Actual,
+        [Parameter(Mandatory)] [string]$Expected
+    )
+
+    return $Actual.Equals($Expected, [StringComparison]::Ordinal) -or
+        $Actual.StartsWith("$Expected+", [StringComparison]::Ordinal)
+}
+
 function Get-PinnedWixExecutable {
     param([Parameter(Mandatory)] [string]$Version)
 
     $installed = Get-Command wix.exe -ErrorAction SilentlyContinue
     if ($null -ne $installed) {
         $installedVersion = (& $installed.Source --version | Select-Object -First 1).Trim()
-        if ($LASTEXITCODE -eq 0 -and $installedVersion.StartsWith("$Version+", [StringComparison]::Ordinal)) {
+        if ($LASTEXITCODE -eq 0 -and (Test-PinnedWixVersion -Actual $installedVersion -Expected $Version)) {
             return $installed.Source
         }
     }
@@ -69,7 +79,7 @@ function Get-PinnedWixExecutable {
     }
 
     $toolVersion = (& $toolExecutable --version | Select-Object -First 1).Trim()
-    if ($LASTEXITCODE -ne 0 -or !$toolVersion.StartsWith("$Version+", [StringComparison]::Ordinal)) {
+    if ($LASTEXITCODE -ne 0 -or !(Test-PinnedWixVersion -Actual $toolVersion -Expected $Version)) {
         throw "Pinned WiX Toolset version validation failed."
     }
     return $toolExecutable
