@@ -107,6 +107,7 @@ public sealed class GitHubAutomationSourceTests
         Assert.Contains("package-ecosystem: nuget", dependabot);
         Assert.Contains("package-ecosystem: pip", dependabot);
         Assert.Contains("/AirType.LocalAsrWorker", dependabot);
+        Assert.DoesNotContain("python-runtime:", dependabot);
     }
 
     private static string ReadWorkflow(string name) =>
