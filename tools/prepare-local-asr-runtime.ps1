@@ -250,7 +250,7 @@ $dependenciesJson = & $Python -c "import json, pathlib, sys, tomllib; print(json
 if ($LASTEXITCODE -ne 0) {
     throw "Failed to read Local ASR dependencies from pyproject.toml."
 }
-$dependencies = @($dependenciesJson | ConvertFrom-Json)
+$dependencies = [string[]](ConvertFrom-Json -InputObject $dependenciesJson)
 $lockedDependencies = @(Get-Content -LiteralPath $runtimeRequirements |
     ForEach-Object { $_.Trim() } |
     Where-Object { $_ -and !$_.StartsWith("#") })

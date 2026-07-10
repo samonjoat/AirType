@@ -40,6 +40,7 @@ public sealed class LocalAsrRuntimePreparationScriptTests
         Assert.Contains("$sourceSignature.SignerCertificate.Subject -ne $file.signerSubject", script);
         Assert.DoesNotContain("$sourceSignature.Status -ne", script);
         Assert.Contains("Visual C++ minimum runtime file set differs from its lock.", script);
+        Assert.Contains("$dependencies = [string[]](ConvertFrom-Json -InputObject $dependenciesJson)", script);
         Assert.DoesNotContain("-m venv $venvRoot", script);
         Assert.DoesNotContain("[string[]]$Models = @(\"base.en\", \"small.en\")", script);
     }
