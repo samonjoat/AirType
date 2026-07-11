@@ -378,8 +378,6 @@ public class FilePersistenceManager : IFilePersistenceManager
                     $"Audio cleanup complete: deleted {deletedCount} files older than {retentionDays} days");
             }
 
-            // Also cleanup application log files
-            CleanupOldAppLogs(retentionDays);
         }
         catch (Exception ex)
         {
@@ -387,29 +385,6 @@ public class FilePersistenceManager : IFilePersistenceManager
         }
 
         return deletedCount;
-    }
-
-    private void CleanupOldAppLogs(int retentionDays)
-    {
-        try
-        {
-            string appLogDir = AirTypeStoragePaths.GetCanonicalPath("Logs", "App");
-            
-            if (!Directory.Exists(appLogDir)) return;
-
-            var cutoffDate = DateTime.Now.AddDays(-retentionDays);
-            var logFiles = Directory.GetFiles(appLogDir, "App_*.log");
-
-            foreach (var filePath in logFiles)
-            {
-                var fileInfo = new FileInfo(filePath);
-                if (fileInfo.CreationTime < cutoffDate)
-                {
-                    try { File.Delete(filePath); } catch { }
-                }
-            }
-        }
-        catch { }
     }
 
     /// <summary>
