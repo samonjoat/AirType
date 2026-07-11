@@ -83,6 +83,20 @@ public sealed class LocalAsrRuntimePreparationScriptTests
     }
 
     [Fact]
+    public void PythonToolchainDependencies_UsePatchedExactPins()
+    {
+        string repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        string project = File.ReadAllText(Path.Combine(repoRoot, "AirType.LocalAsrWorker", "pyproject.toml"));
+
+        Assert.Contains("setuptools==83.0.0", project);
+        Assert.Contains("wheel==0.47.0", project);
+        Assert.Contains("pytest==9.1.1", project);
+        Assert.DoesNotContain("setuptools==75.6.0", project);
+        Assert.DoesNotContain("wheel==0.45.1", project);
+        Assert.DoesNotContain("pytest==9.0.2", project);
+    }
+
+    [Fact]
     public void PackageRuntimeScript_EmitsReleaseMetadataAndRejectsRetiredBaseModel()
     {
         string repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));

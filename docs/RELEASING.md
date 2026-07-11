@@ -29,8 +29,7 @@ Set-Location .\AirType.LocalAsrWorker
 python -m pytest .\tests -q
 Set-Location ..
 
-dotnet list .\AirType\AirType.csproj package --vulnerable --include-transitive
-python -m pip_audit -r .\AirType.LocalAsrWorker\requirements-runtime.txt
+.\tools\audit-dependencies.ps1
 python .\tools\generate-notification-sound-candidates.py --verify-production
 ```
 

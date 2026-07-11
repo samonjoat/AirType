@@ -78,7 +78,13 @@ public sealed class GitHubAutomationSourceTests
         Assert.Contains("GITLEAKS_ENABLE_COMMENTS: 'false'", workflow);
         Assert.Contains("dotnet restore $projectPath", auditScript);
         Assert.Contains("--vulnerable --include-transitive --format json", auditScript);
+        Assert.Contains("python-all-requirements.txt", auditScript);
+        Assert.Contains("configuration.get(\"build-system\", {})", auditScript);
+        Assert.Contains("project.get(\"dependencies\", [])", auditScript);
+        Assert.Contains("project.get(\"optional-dependencies\", {})", auditScript);
+        Assert.Contains("--requirement $pythonAuditRequirementsPath", auditScript);
         Assert.Contains("python-vulnerabilities.json", auditScript);
+        Assert.DoesNotContain("--requirement $requirementsPath", auditScript);
         Assert.True(
             auditScript.IndexOf("dotnet restore $projectPath", StringComparison.Ordinal) <
             auditScript.IndexOf("dotnet list $projectPath package", StringComparison.Ordinal));
