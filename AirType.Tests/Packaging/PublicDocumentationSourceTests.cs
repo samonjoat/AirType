@@ -108,6 +108,9 @@ public sealed class PublicDocumentationSourceTests
         Assert.Contains("Windows Data Protection API", privacy);
         Assert.Contains("fallback priority is Groq, then OpenRouter", privacy);
         Assert.Contains("does **not** delete transcript-history rows", privacy);
+        Assert.Contains("Application diagnostic logs use a separate storage limit", privacy);
+        Assert.Contains("up to seven historical application logs", privacy);
+        Assert.DoesNotContain("application logs older than that period", privacy);
         Assert.Contains("Provider-side copies", privacy);
         Assert.Contains("does not send product analytics or telemetry", privacy);
     }
