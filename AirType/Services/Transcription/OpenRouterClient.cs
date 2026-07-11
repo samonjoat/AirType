@@ -8,9 +8,6 @@ using System.Threading.Tasks;
 using AirType.Models.Transcription;
 using AirType.Services.Configuration;
 using AirType.Services.Dictionary;
-using Microsoft.Extensions.Http;
-using Polly;
-using Polly.Extensions.Http;
 
 namespace AirType.Services.Transcription;
 
@@ -43,29 +40,13 @@ public class OpenRouterClient : IOpenRouterClient, IDisposable
         _credentialManager = credentialManager ?? throw new ArgumentNullException(nameof(credentialManager));
         _dictionaryPromptBuilder = dictionaryPromptBuilder;
 
-        var retryPolicy = HttpPolicyExtensions
-            .HandleTransientHttpError() // 5xx, 408
-            .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests) // 429
-            .WaitAndRetryAsync(
-                retryCount: 3,
-                sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt - 1)), // 1s, 2s, 4s
-                onRetry: (outcome, timespan, retryAttempt, context) =>
-                {
-                    Logger.Debug("OpenRouterClient", $"Retry {retryAttempt} after {timespan.TotalSeconds}s - Status: {outcome.Result?.StatusCode}");
-                });
-
         var handler = new HttpClientHandler
         {
             MaxConnectionsPerServer = 10,
             UseProxy = false
         };
 
-        var policyHandler = new PolicyHttpMessageHandler(retryPolicy)
-        {
-            InnerHandler = handler
-        };
-
-        _httpClient = new HttpClient(policyHandler)
+        _httpClient = new HttpClient(new OpenRouterRetryHandler(handler))
         {
             Timeout = MaxTimeout
         };
