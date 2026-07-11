@@ -22,6 +22,23 @@ public sealed class RepositoryHygieneSourceTests
     }
 
     [Fact]
+    public void PublicSource_DoesNotContainDesignMockupsOrLegacyDictionaryModel()
+    {
+        Assert.False(Directory.Exists(Path.Combine(RepoRoot, "AirType", "mockups")));
+        Assert.False(File.Exists(Path.Combine(
+            RepoRoot,
+            "AirType",
+            "Models",
+            "DictionaryEntry.cs")));
+
+        string snapshotScript = File.ReadAllText(Path.Combine(
+            RepoRoot,
+            "tools",
+            "build-public-snapshot.ps1"));
+        Assert.Contains("\"mockups\"", snapshotScript);
+    }
+
+    [Fact]
     public void ProductionCSharpSource_DoesNotContainAbsoluteUserHomePath()
     {
         string sourceRoot = Path.Combine(RepoRoot, "AirType");
