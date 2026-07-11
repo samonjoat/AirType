@@ -1,0 +1,7 @@
+* @samonjoat
+
+/.github/workflows/ @samonjoat
+/tools/build-release.ps1 @samonjoat
+/tools/finalize-signpath-release.ps1 @samonjoat
+/tools/release-archive.ps1 @samonjoat
+/CODE_SIGNING_POLICY.md @samonjoat

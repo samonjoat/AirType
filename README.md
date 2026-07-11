@@ -91,6 +91,12 @@ Python or the Visual C++ Redistributable globally.
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for service boundaries and
 the transcription data flow.
 
+## Code Signing Policy
+
+Official stable packages follow the [AirType Code Signing Policy](CODE_SIGNING_POLICY.md).
+Free code signing is provided by SignPath.io, with the certificate provided by
+SignPath Foundation. Unsigned validation candidates are never stable releases.
+
 ## Contributing And Security
 
 Read [`CONTRIBUTING.md`](CONTRIBUTING.md) and sign every contribution under the

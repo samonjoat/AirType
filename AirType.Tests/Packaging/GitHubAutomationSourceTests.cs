@@ -14,7 +14,7 @@ public sealed class GitHubAutomationSourceTests
         string workflowRoot = Path.Combine(RepoRoot, ".github", "workflows");
         string[] workflows = Directory.GetFiles(workflowRoot, "*.yml");
 
-        Assert.Equal(3, workflows.Length);
+        Assert.Equal(4, workflows.Length);
         foreach (string workflowPath in workflows)
         {
             string workflow = File.ReadAllText(workflowPath);
@@ -100,6 +100,29 @@ public sealed class GitHubAutomationSourceTests
         Assert.Contains("-unsigned", workflow);
         Assert.Contains("actions/upload-artifact@", workflow);
         Assert.Contains("Published as GitHub Release: no", workflow);
+        Assert.DoesNotContain("gh release", workflow, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("create-release", workflow, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void SignReleaseWorkflow_IsPinnedReadOnlyManualAndCannotPublish()
+    {
+        string workflow = ReadWorkflow("sign-release.yml");
+
+        Assert.Contains("workflow_dispatch", workflow);
+        Assert.Contains("runs-on: windows-2025", workflow);
+        Assert.Contains("environment: release-signing", workflow);
+        Assert.Contains("actions: read", workflow);
+        Assert.Contains("-KeepStaging", workflow);
+        Assert.Contains("github-artifact-id:", workflow);
+        Assert.Contains("SignPath/github-action-submit-signing-request@b9d91eadd323de506c0c81cf0c7fe7438f3360fd", workflow);
+        Assert.Contains("SIGNPATH_API_TOKEN", workflow);
+        Assert.Contains("SIGNPATH_ORGANIZATION_ID", workflow);
+        Assert.Contains("SIGNPATH_PROJECT_SLUG", workflow);
+        Assert.Contains("SIGNPATH_SIGNING_POLICY_SLUG", workflow);
+        Assert.Contains("finalize-signpath-release.ps1", workflow);
+        Assert.Contains("Published as GitHub Release: no", workflow);
+        Assert.DoesNotContain("contents: write", workflow);
         Assert.DoesNotContain("gh release", workflow, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("create-release", workflow, StringComparison.OrdinalIgnoreCase);
     }

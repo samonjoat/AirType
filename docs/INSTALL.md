@@ -36,7 +36,8 @@ The first value in the sidecar must equal the calculated hash. For a stable
 release, open `AirType.exe` properties after extraction, select **Digital
 Signatures**, and confirm Windows reports a valid signature whose publisher
 matches the release notes. Stop if the stable artifact is unsigned, invalid,
-or has a different checksum.
+or has a different checksum. See the project
+[Code signing policy](../CODE_SIGNING_POLICY.md) for signing scope and controls.
 
 ## Install And Start
 
