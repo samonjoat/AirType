@@ -19,8 +19,10 @@ New-Item -ItemType Directory -Force -Path $fullReportRoot | Out-Null
 
 $projectPath = Join-Path $repoRoot "AirType\AirType.csproj"
 $requirementsPath = Join-Path $repoRoot "AirType.LocalAsrWorker\requirements-runtime.txt"
+$pyprojectPath = Join-Path $repoRoot "AirType.LocalAsrWorker\pyproject.toml"
 $nugetReportPath = Join-Path $fullReportRoot "nuget-vulnerabilities.json"
 $pythonReportPath = Join-Path $fullReportRoot "python-vulnerabilities.json"
+$pythonAuditRequirementsPath = Join-Path $fullReportRoot "python-all-requirements.txt"
 
 & dotnet restore $projectPath --verbosity minimal
 if ($LASTEXITCODE -ne 0) {
@@ -71,8 +73,47 @@ if ($nugetVulnerabilities.Count -gt 0) {
     throw "NuGet dependency audit found $($nugetVulnerabilities.Count) vulnerability record(s)."
 }
 
+$exportAuditRequirements = @'
+import pathlib
+import sys
+import tomllib
+
+pyproject_path = pathlib.Path(sys.argv[1])
+runtime_lock_path = pathlib.Path(sys.argv[2])
+output_path = pathlib.Path(sys.argv[3])
+
+configuration = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))
+requirements = [
+    line.strip()
+    for line in runtime_lock_path.read_text(encoding="utf-8").splitlines()
+    if line.strip() and not line.lstrip().startswith("#")
+]
+
+def append_group(values, source):
+    if not isinstance(values, list) or not all(isinstance(value, str) for value in values):
+        raise TypeError(f"{source} must be a list of dependency strings")
+    requirements.extend(values)
+
+append_group(configuration.get("build-system", {}).get("requires", []), "build-system.requires")
+project = configuration.get("project", {})
+append_group(project.get("dependencies", []), "project.dependencies")
+optional_dependencies = project.get("optional-dependencies", {})
+if not isinstance(optional_dependencies, dict):
+    raise TypeError("project.optional-dependencies must be a table")
+for group_name, group_requirements in optional_dependencies.items():
+    append_group(group_requirements, f"project.optional-dependencies.{group_name}")
+
+unique_requirements = sorted(set(requirements), key=str.casefold)
+output_path.write_text("\n".join(unique_requirements) + "\n", encoding="utf-8", newline="\n")
+'@
+
+& $Python -c $exportAuditRequirements $pyprojectPath $requirementsPath $pythonAuditRequirementsPath
+if ($LASTEXITCODE -ne 0) {
+    throw "Failed to construct the comprehensive Python dependency audit input."
+}
+
 & $Python -m pip_audit `
-    --requirement $requirementsPath `
+    --requirement $pythonAuditRequirementsPath `
     --strict `
     --progress-spinner off `
     --format json `
@@ -86,4 +127,5 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "Dependency audits passed."
 Write-Host "  NuGet report: $nugetReportPath"
+Write-Host "  Python input: $pythonAuditRequirementsPath"
 Write-Host "  Python report: $pythonReportPath"

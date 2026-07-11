@@ -67,6 +67,8 @@ public sealed class PublicDocumentationSourceTests
         Assert.Contains("Do not label it stable", releasing);
         Assert.Contains("build-public-snapshot.ps1", releasing);
         Assert.Contains(".\\tools\\test.ps1", releasing);
+        Assert.Contains(".\\tools\\audit-dependencies.ps1", releasing);
+        Assert.DoesNotContain("python -m pip_audit -r", releasing);
         Assert.DoesNotContain("AGENTS.md", releasing);
         Assert.DoesNotContain("implementation-plans", releasing);
     }
