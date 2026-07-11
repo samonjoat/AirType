@@ -38,13 +38,38 @@ public sealed class ReleasePackagingSourceTests
         Assert.Contains("AIRTYPE_SIGNING_CERTIFICATE_THUMBPRINT", script);
         Assert.Contains("Get-AuthenticodeSignature", script);
         Assert.Contains("-unsigned", script);
-        Assert.Contains("New-DeterministicZip", script);
+        Assert.Contains("release-archive.ps1", script);
+        Assert.Contains("New-AirTypeDeterministicZip", script);
+        Assert.Contains("KeepStaging", script);
         Assert.Contains("release-manifest.json", script);
         Assert.Contains("sourceBranch = $branch", script);
         Assert.Contains("dirty = $gitStatus.Count -ne 0", script);
         Assert.Contains(".sha256", script);
         Assert.Contains("verify-release-package.ps1", script);
         Assert.DoesNotContain("CertificatePassword", script);
+    }
+
+    [Fact]
+    public void SignPathFinalizer_IsFailClosedAndUsesSharedDeterministicArchive()
+    {
+        string finalizer = File.ReadAllText(
+            Path.Combine(RepoRoot, "tools", "finalize-signpath-release.ps1"));
+        string archive = File.ReadAllText(Path.Combine(RepoRoot, "tools", "release-archive.ps1"));
+
+        Assert.Contains("SignPath finalization requires a clean git worktree", finalizer);
+        Assert.Contains("SignPath stable packages must originate from main", finalizer);
+        Assert.Contains("release manifest is missing dirty provenance", finalizer);
+        Assert.Contains("dirty provenance is not Boolean", finalizer);
+        Assert.Contains("Get-AuthenticodeSignature", finalizer);
+        Assert.Contains("SignPath Foundation", finalizer);
+        Assert.Contains("release-manifest.json", finalizer);
+        Assert.Contains("New-AirTypeDeterministicZip", finalizer);
+        Assert.Contains("verify-release-package.ps1", finalizer);
+        Assert.DoesNotContain("AllowUnsigned", finalizer);
+        Assert.Contains("function New-AirTypeDeterministicZip", archive);
+        Assert.Contains("Release archive destination must be outside", archive);
+        Assert.Contains("CompressionLevel]::Optimal", archive);
+        Assert.Contains("2000, 1, 1", archive);
     }
 
     [Fact]

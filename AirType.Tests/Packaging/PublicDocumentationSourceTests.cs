@@ -18,6 +18,7 @@ public sealed class PublicDocumentationSourceTests
             "CODE_OF_CONDUCT.md",
             "CONTRIBUTING.md",
             "DCO.txt",
+            "CODE_SIGNING_POLICY.md",
             "PRIVACY.md",
             "THIRD_PARTY_NOTICES.md",
             "TRADEMARKS.md",
@@ -97,6 +98,32 @@ public sealed class PublicDocumentationSourceTests
     }
 
     [Fact]
+    public void CodeSigningPolicy_DeclaresFoundationCreditRolesPrivacyAndBuildControls()
+    {
+        string policy = File.ReadAllText(Path.Combine(RepoRoot, "CODE_SIGNING_POLICY.md"));
+        string readme = File.ReadAllText(Path.Combine(RepoRoot, "README.md"));
+        string install = File.ReadAllText(Path.Combine(RepoRoot, "docs", "INSTALL.md"));
+        string security = File.ReadAllText(Path.Combine(RepoRoot, "SECURITY.md"));
+        string releasing = File.ReadAllText(Path.Combine(RepoRoot, "docs", "RELEASING.md"));
+        string codeOwners = File.ReadAllText(Path.Combine(RepoRoot, ".github", "CODEOWNERS"));
+
+        Assert.Contains("Free code signing provided by", policy);
+        Assert.Contains("certificate", policy);
+        Assert.Contains("SignPath Foundation", policy);
+        Assert.Contains("Committers and reviewers", policy);
+        Assert.Contains("Signing approvers", policy);
+        Assert.Contains("PRIVACY.md", policy);
+        Assert.Contains("GitHub-hosted Windows runner", policy);
+        Assert.Contains("CODE_SIGNING_POLICY.md", readme);
+        Assert.Contains("Code signing policy", install);
+        Assert.Contains("Code signing policy", security);
+        Assert.Contains("SignPath Foundation Enrollment And Workflow", releasing);
+        Assert.Contains("SIGNPATH_API_TOKEN", releasing);
+        Assert.Contains("/CODE_SIGNING_POLICY.md @samonjoat", codeOwners);
+        Assert.Contains("/.github/workflows/ @samonjoat", codeOwners);
+    }
+
+    [Fact]
     public void PrivacyNotice_DisclosesCloudInputsLocalTracesAndDeletionBoundaries()
     {
         string privacy = File.ReadAllText(Path.Combine(RepoRoot, "PRIVACY.md"));
@@ -122,6 +149,7 @@ public sealed class PublicDocumentationSourceTests
 
         Assert.Contains("..\\LICENSE", project);
         Assert.Contains("..\\PRIVACY.md", project);
+        Assert.Contains("..\\CODE_SIGNING_POLICY.md", project);
         Assert.Contains("..\\THIRD_PARTY_NOTICES.md", project);
         Assert.Contains("..\\SECURITY.md", project);
         Assert.Contains("..\\docs\\INSTALL.md", project);

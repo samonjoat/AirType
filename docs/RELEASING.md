@@ -115,6 +115,43 @@ or Python installed:
 
 Record the OS build, source commit, artifact hash, signature state, and result.
 
+## SignPath Foundation Enrollment And Workflow
+
+The repository can prepare for SignPath while private, but SignPath Foundation
+requires an eligible project to be public, documented, and already released in
+the form that will be signed. Enrollment therefore occurs only after the final
+private audit and explicit publication approval:
+
+1. Make the validated AirType repository public.
+2. Publish the exact accepted unsigned package as a clearly labeled GitHub
+   **pre-release**, not a stable release.
+3. Apply to SignPath Foundation and link the public AirType repository.
+4. Install the SignPath GitHub App for the repository and configure an AirType
+   project whose default artifact configuration accepts the GitHub artifact ZIP,
+   signs only `AirType.exe`, enforces product name `AirType`, and accepts a
+   required `version` parameter for product/file version restrictions.
+5. Configure a signing policy with manual approval and assign the roles listed
+   in [`../CODE_SIGNING_POLICY.md`](../CODE_SIGNING_POLICY.md).
+6. Configure the GitHub `release-signing` environment and these repository
+   values:
+
+   - secret `SIGNPATH_API_TOKEN`;
+   - variable `SIGNPATH_ORGANIZATION_ID`;
+   - variable `SIGNPATH_PROJECT_SLUG`;
+   - variable `SIGNPATH_SIGNING_POLICY_SLUG`.
+
+The manual `Sign release package` workflow runs only from `main`. It builds and
+validates the public snapshot, preserves the unsigned staging tree, uploads that
+tree to GitHub, submits its GitHub artifact ID to SignPath, waits for approval,
+and rejects the returned tree unless `AirType.exe` has a valid Authenticode
+signature from SignPath Foundation with matching clean-source provenance. It
+then creates and verifies the deterministic stable ZIP and uploads it as a
+workflow artifact. The workflow never creates a GitHub Release.
+
+After signing, download the returned ZIP and checksum, record their exact hashes,
+and repeat Windows 10 and Windows 11 clean-machine acceptance. A byte change,
+rebuild, different signature, or different hash invalidates earlier acceptance.
+
 ## Produce A Signed Stable Package
 
 For local certificate signing, set the protected certificate thumbprint and run:
@@ -124,9 +161,10 @@ $env:AIRTYPE_SIGNING_CERTIFICATE_THUMBPRINT = '<protected thumbprint>'
 .\tools\build-release.ps1 -Version 1.0.0 -PublicRelease
 ```
 
-The GitHub release workflow may instead submit the verified executable to
-SignPath and assemble the stable package from the returned signed artifact. In
-either path, the signed executable must correspond to the tested source and
+After SignPath enrollment, use the manual `Sign release package` GitHub Actions
+workflow. It submits the GitHub-built staging artifact and runs
+`finalize-signpath-release.ps1` on the returned signed tree. In either the local
+or SignPath path, the signed executable must correspond to the tested source and
 release manifest. Any rebuild or byte change requires package verification and
 clean-machine acceptance again.
 

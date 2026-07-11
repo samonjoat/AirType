@@ -4,7 +4,8 @@ param(
     [switch]$PublicRelease,
     [string]$CertificateThumbprint = $env:AIRTYPE_SIGNING_CERTIFICATE_THUMBPRINT,
     [string]$TimestampUrl = "http://timestamp.digicert.com",
-    [switch]$SkipRuntimePreparation
+    [switch]$SkipRuntimePreparation,
+    [switch]$KeepStaging
 )
 
 $ErrorActionPreference = "Stop"
@@ -13,6 +14,7 @@ Set-StrictMode -Version Latest
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $projectPath = Join-Path $repoRoot "AirType\AirType.csproj"
 $publishProfile = "win-x64-self-contained"
+. (Join-Path $PSScriptRoot "release-archive.ps1")
 
 if ($Version -notmatch '^\d+\.\d+\.\d+$') {
     throw "Version must use stable semantic version format x.y.z."
@@ -54,19 +56,6 @@ function Remove-SafeDirectory {
     }
 }
 
-function Get-PortableRelativePath {
-    param(
-        [Parameter(Mandatory)] [string]$BaseDirectory,
-        [Parameter(Mandatory)] [string]$Path
-    )
-
-    $basePath = [IO.Path]::GetFullPath($BaseDirectory).TrimEnd('\') + '\'
-    $targetPath = [IO.Path]::GetFullPath($Path)
-    $baseUri = [Uri]::new($basePath)
-    $targetUri = [Uri]::new($targetPath)
-    return [Uri]::UnescapeDataString($baseUri.MakeRelativeUri($targetUri).ToString()).Replace('/', '\')
-}
-
 function Resolve-SignTool {
     $windowsKitsRoot = Join-Path ${env:ProgramFiles(x86)} "Windows Kits\10\bin"
     if (!(Test-Path -LiteralPath $windowsKitsRoot)) {
@@ -84,54 +73,6 @@ function Resolve-SignTool {
     }
 
     return $signTool
-}
-
-function New-DeterministicZip {
-    param(
-        [Parameter(Mandatory)] [string]$SourceDirectory,
-        [Parameter(Mandatory)] [string]$DestinationPath
-    )
-
-    Add-Type -AssemblyName System.IO.Compression
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    if (Test-Path -LiteralPath $DestinationPath) {
-        Remove-Item -LiteralPath $DestinationPath -Force
-    }
-
-    $sourceRoot = [IO.Path]::GetFullPath($SourceDirectory).TrimEnd('\')
-    $stream = [IO.File]::Open($DestinationPath, [IO.FileMode]::CreateNew)
-    try {
-        $archive = [IO.Compression.ZipArchive]::new($stream, [IO.Compression.ZipArchiveMode]::Create, $false)
-        try {
-            $fixedTimestamp = [DateTimeOffset]::new(2000, 1, 1, 0, 0, 0, [TimeSpan]::Zero)
-            Get-ChildItem -LiteralPath $sourceRoot -Recurse -File |
-                Sort-Object FullName |
-                ForEach-Object {
-                    $relativePath = (Get-PortableRelativePath -BaseDirectory $sourceRoot -Path $_.FullName).Replace('\', '/')
-                    $entry = $archive.CreateEntry($relativePath, [IO.Compression.CompressionLevel]::Optimal)
-                    $entry.LastWriteTime = $fixedTimestamp
-                    $entryStream = $entry.Open()
-                    try {
-                        $fileStream = [IO.File]::OpenRead($_.FullName)
-                        try {
-                            $fileStream.CopyTo($entryStream)
-                        }
-                        finally {
-                            $fileStream.Dispose()
-                        }
-                    }
-                    finally {
-                        $entryStream.Dispose()
-                    }
-                }
-        }
-        finally {
-            $archive.Dispose()
-        }
-    }
-    finally {
-        $stream.Dispose()
-    }
 }
 
 $gitStatus = @(git -C $repoRoot status --porcelain)
@@ -239,7 +180,7 @@ $releaseManifest |
 $artifactStem = "AirType-$Version-win-x64" + $(if ($signed) { "" } else { "-unsigned" })
 $zipPath = Join-Path $outputRoot "$artifactStem.zip"
 $checksumPath = Join-Path $outputRoot "$artifactStem.sha256"
-New-DeterministicZip -SourceDirectory $stagingRoot -DestinationPath $zipPath
+New-AirTypeDeterministicZip -SourceDirectory $stagingRoot -DestinationPath $zipPath
 
 $zipHash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
 "$zipHash  $([IO.Path]::GetFileName($zipPath))" |
@@ -255,7 +196,9 @@ finally {
     $archive.Dispose()
 }
 
-Remove-SafeDirectory -Path $stagingRoot -AllowedRoot $outputRoot
+if (!$KeepStaging) {
+    Remove-SafeDirectory -Path $stagingRoot -AllowedRoot $outputRoot
+}
 
 $verificationArguments = @(
     "-NoProfile",

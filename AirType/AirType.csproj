@@ -62,6 +62,9 @@
     <Content Include="..\PRIVACY.md"
              Link="PRIVACY.md"
              CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\CODE_SIGNING_POLICY.md"
+             Link="CODE_SIGNING_POLICY.md"
+             CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\THIRD_PARTY_NOTICES.md"
              Link="THIRD_PARTY_NOTICES.md"
              CopyToOutputDirectory="PreserveNewest" />

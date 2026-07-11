@@ -81,6 +81,7 @@ function Test-PublicSourcePath {
         ".gitattributes",
         "AirType.sln",
         "CODE_OF_CONDUCT.md",
+        "CODE_SIGNING_POLICY.md",
         "CONTRIBUTING.md",
         "DCO.txt",
         "global.json",
@@ -178,7 +179,7 @@ appsettings.Production.json
 $allowedTopLevel = @(
     ".editorconfig", ".gitattributes", ".github", ".gitignore",
     "AirType", "AirType.LocalAsrWorker", "AirType.Tests", "AirType.sln",
-    "CODE_OF_CONDUCT.md", "CONTRIBUTING.md", "DCO.txt", "docs", "global.json",
+    "CODE_OF_CONDUCT.md", "CODE_SIGNING_POLICY.md", "CONTRIBUTING.md", "DCO.txt", "docs", "global.json",
     "LICENSE", "PRIVACY.md", "README.md", "SECURITY.md",
     "THIRD_PARTY_NOTICES.md", "tools", "TRADEMARKS.md"
 )
@@ -261,7 +262,12 @@ foreach ($requiredPath in @(
     "AirType.Tests/AirType.Tests.csproj",
     "AirType/Fonts/Inter/OFL.txt",
     "AirType/Sounds/PROVENANCE.md",
+    "CODE_SIGNING_POLICY.md",
+    ".github/CODEOWNERS",
+    ".github/workflows/sign-release.yml",
     "tools/build-release.ps1",
+    "tools/finalize-signpath-release.ps1",
+    "tools/release-archive.ps1",
     "tools/build-public-snapshot.ps1",
     "tools/test.ps1"
 )) {

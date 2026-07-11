@@ -88,6 +88,7 @@ try {
         $releaseManifestPath,
         (Join-Path $extractionRoot "LICENSE"),
         (Join-Path $extractionRoot "PRIVACY.md"),
+        (Join-Path $extractionRoot "CODE_SIGNING_POLICY.md"),
         (Join-Path $extractionRoot "THIRD_PARTY_NOTICES.md"),
         (Join-Path $extractionRoot "SECURITY.md"),
         (Join-Path $extractionRoot "INSTALL.md"),
