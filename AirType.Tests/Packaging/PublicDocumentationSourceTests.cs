@@ -125,6 +125,41 @@ public sealed class PublicDocumentationSourceTests
     }
 
     [Fact]
+    public void PublicSource_OmitsUnusedUiAndModelRemnants()
+    {
+        string[] obsoleteFiles =
+        {
+            Path.Combine("AirType", "Converters", "DummyConverter.cs"),
+            Path.Combine("AirType", "Converters", "StringEmptyToVisibilityConverter.cs"),
+            Path.Combine("AirType", "Models", "HistoryEntry.cs"),
+            Path.Combine("AirType", "Models", "LogEntryViewModel.cs")
+        };
+        Assert.All(obsoleteFiles, path => Assert.False(File.Exists(Path.Combine(RepoRoot, path))));
+
+        string app = File.ReadAllText(Path.Combine(RepoRoot, "AirType", "App.xaml"));
+        string dialog = File.ReadAllText(
+            Path.Combine(RepoRoot, "AirType", "Views", "AddToDictionaryDialog.xaml"));
+        string settings = File.ReadAllText(
+            Path.Combine(RepoRoot, "AirType", "Views", "SettingsView.xaml"));
+        string comboStyles = File.ReadAllText(
+            Path.Combine(RepoRoot, "AirType", "Styles", "ComboBoxStyles.xaml"));
+        string project = File.ReadAllText(Path.Combine(RepoRoot, "AirType", "AirType.csproj"));
+
+        Assert.DoesNotContain("StringEmptyToVisibilityConverter", app);
+        Assert.DoesNotContain("DummyConverter", app);
+        Assert.DoesNotContain("InverseBoolToVisConverter", app);
+        Assert.DoesNotContain("BoolToVisConverter", app);
+        Assert.DoesNotContain("MaterialDesignTheme.Defaults.xaml", app);
+        Assert.Contains("InverseBooleanToVisibilityConverter", dialog);
+        Assert.Contains("BooleanToVisibilityConverter", dialog);
+        Assert.DoesNotContain("InverseBoolToVisConverter", dialog);
+        Assert.DoesNotContain("BoolToVisConverter", dialog);
+        Assert.DoesNotContain("x:Key=\"InverseBoolToVis\"", settings);
+        Assert.DoesNotContain("WpfDictationUI", comboStyles);
+        Assert.DoesNotContain("<PackageReference Include=\"MaterialDesignColors\"", project);
+    }
+
+    [Fact]
     public void ReleasePipeline_CollectsAndVerifiesThirdPartyEvidence()
     {
         string collector = File.ReadAllText(Path.Combine(RepoRoot, "tools", "collect-third-party-licenses.ps1"));
