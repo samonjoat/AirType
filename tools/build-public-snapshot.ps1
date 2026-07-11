@@ -264,6 +264,7 @@ foreach ($requiredPath in @(
     "AirType/Sounds/PROVENANCE.md",
     "CODE_SIGNING_POLICY.md",
     ".github/CODEOWNERS",
+    ".github/workflows/codeql.yml",
     ".github/workflows/sign-release.yml",
     "tools/build-release.ps1",
     "tools/finalize-signpath-release.ps1",
