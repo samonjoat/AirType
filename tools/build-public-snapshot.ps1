@@ -191,7 +191,7 @@ if ($unexpectedTopLevel.Count -gt 0) {
 }
 
 $forbiddenSegments = @(
-    ".git", ".temp", ".venv", ".vs", "__pycache__", "bin", "obj"
+    ".git", ".temp", ".venv", ".vs", "__pycache__", "bin", "mockups", "obj"
 )
 $forbiddenTopLevel = @(
     "benchmark-results", "design-assets", "implementation-plans", "planning",
