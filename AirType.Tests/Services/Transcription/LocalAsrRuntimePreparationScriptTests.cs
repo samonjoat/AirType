@@ -69,6 +69,27 @@ public sealed class LocalAsrRuntimePreparationScriptTests
     }
 
     [Fact]
+    public void VisualCppExtraction_RetriesOnlyKnownClosedPipeFailureWithFreshDirectories()
+    {
+        string repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        string script = File.ReadAllText(Path.Combine(repoRoot, "tools", "prepare-local-asr-runtime.ps1"));
+
+        Assert.Contains("function Invoke-WixBurnExtract", script);
+        Assert.Contains("[int]$MaxAttempts = 3", script);
+        Assert.Contains("[int]$RetryDelaySeconds = 5", script);
+        Assert.Contains("wix-attempt-$attempt", script);
+        Assert.Contains("-intermediateFolder $intermediateRoot", script);
+        Assert.Contains("$line.IndexOf(\"WIX0001\"", script);
+        Assert.Contains("$line.IndexOf(\"The pipe is being closed\"", script);
+        Assert.Contains("$isClosedPipeFailure = $sawWix0001 -and $sawClosedPipe", script);
+        Assert.DoesNotContain("$extractOutput = @(", script);
+        Assert.Contains("if (!$isClosedPipeFailure -or $attempt -eq $MaxAttempts)", script);
+        Assert.Contains("Start-Sleep -Seconds $RetryDelaySeconds", script);
+        Assert.Contains("PayloadRoot = $payloadRoot", script);
+        Assert.Contains("BootstrapperRoot = $bootstrapperRoot", script);
+    }
+
+    [Fact]
     public void RuntimeDependencies_UsePcmShimInsteadOfPyavCodecStack()
     {
         string repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
