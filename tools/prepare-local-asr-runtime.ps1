@@ -85,6 +85,58 @@ function Get-PinnedWixExecutable {
     return $toolExecutable
 }
 
+function Invoke-WixBurnExtract {
+    param(
+        [Parameter(Mandatory)] [string]$Wix,
+        [Parameter(Mandatory)] [string]$InstallerPath,
+        [Parameter(Mandatory)] [string]$WorkRoot,
+        [int]$MaxAttempts = 3,
+        [int]$RetryDelaySeconds = 5
+    )
+
+    for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+        $attemptRoot = Join-Path $WorkRoot "wix-attempt-$attempt"
+        $payloadRoot = Join-Path $attemptRoot "payloads"
+        $bootstrapperRoot = Join-Path $attemptRoot "bootstrapper"
+        $intermediateRoot = Join-Path $attemptRoot "intermediate"
+        New-Item -ItemType Directory -Force -Path $payloadRoot, $bootstrapperRoot, $intermediateRoot | Out-Null
+
+        $sawWix0001 = $false
+        $sawClosedPipe = $false
+        & $Wix burn extract $InstallerPath `
+            -o $payloadRoot `
+            -oba $bootstrapperRoot `
+            -intermediateFolder $intermediateRoot 2>&1 | ForEach-Object {
+                $line = $_.ToString()
+                Write-Host $line
+                if ($line.IndexOf("WIX0001", [StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                    $sawWix0001 = $true
+                }
+                if ($line.IndexOf("The pipe is being closed", [StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                    $sawClosedPipe = $true
+                }
+            }
+        $extractExitCode = $LASTEXITCODE
+
+        if ($extractExitCode -eq 0) {
+            return [pscustomobject]@{
+                PayloadRoot = $payloadRoot
+                BootstrapperRoot = $bootstrapperRoot
+            }
+        }
+
+        $isClosedPipeFailure = $sawWix0001 -and $sawClosedPipe
+        if (!$isClosedPipeFailure -or $attempt -eq $MaxAttempts) {
+            throw "Failed to extract the pinned Visual C++ Redistributable."
+        }
+
+        Write-Warning "WiX native extraction closed its internal pipe on attempt $attempt of $MaxAttempts; retrying with fresh directories."
+        Start-Sleep -Seconds $RetryDelaySeconds
+    }
+
+    throw "Failed to extract the pinned Visual C++ Redistributable."
+}
+
 function Install-PinnedVisualCppRuntime {
     param(
         [Parameter(Mandatory)] [string]$DestinationRoot,
@@ -121,15 +173,12 @@ function Install-PinnedVisualCppRuntime {
 
     $wix = Get-PinnedWixExecutable -Version $lock.wixToolVersion
     $workRoot = Join-Path $env:TEMP "AirTypeVcRuntime_$([Guid]::NewGuid().ToString('N'))"
-    $payloadRoot = Join-Path $workRoot "payloads"
-    $bootstrapperRoot = Join-Path $workRoot "bootstrapper"
     $expandedRoot = Join-Path $workRoot "expanded"
-    New-Item -ItemType Directory -Force -Path $payloadRoot, $bootstrapperRoot, $expandedRoot | Out-Null
+    New-Item -ItemType Directory -Force -Path $expandedRoot | Out-Null
     try {
-        & $wix burn extract $installerPath -o $payloadRoot -oba $bootstrapperRoot
-        if ($LASTEXITCODE -ne 0) {
-            throw "Failed to extract the pinned Visual C++ Redistributable."
-        }
+        $extraction = Invoke-WixBurnExtract -Wix $wix -InstallerPath $installerPath -WorkRoot $workRoot
+        $payloadRoot = $extraction.PayloadRoot
+        $bootstrapperRoot = $extraction.BootstrapperRoot
 
         $burnManifestPath = Join-Path $bootstrapperRoot "manifest.xml"
         [xml]$burnManifest = Get-Content -LiteralPath $burnManifestPath -Raw
