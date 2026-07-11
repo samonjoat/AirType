@@ -120,6 +120,8 @@ public sealed class GitHubAutomationSourceTests
         Assert.Contains("workflow_dispatch", workflow);
         Assert.Contains("build-release.ps1", workflow);
         Assert.Contains("-unsigned", workflow);
+        Assert.Contains("-unsigned.msi", workflow);
+        Assert.Contains("-unsigned.msi.sha256", workflow);
         Assert.Contains("actions/upload-artifact@", workflow);
         Assert.Contains("Published as GitHub Release: no", workflow);
         Assert.DoesNotContain("gh release", workflow, StringComparison.OrdinalIgnoreCase);
@@ -142,7 +144,13 @@ public sealed class GitHubAutomationSourceTests
         Assert.Contains("SIGNPATH_ORGANIZATION_ID", workflow);
         Assert.Contains("SIGNPATH_PROJECT_SLUG", workflow);
         Assert.Contains("SIGNPATH_SIGNING_POLICY_SLUG", workflow);
+        Assert.Contains("SIGNPATH_PAYLOAD_ARTIFACT_CONFIGURATION_SLUG", workflow);
+        Assert.Contains("SIGNPATH_INSTALLER_ARTIFACT_CONFIGURATION_SLUG", workflow);
+        Assert.Contains("artifact-configuration-slug:", workflow);
+        Assert.Contains("upload-installer-input", workflow);
         Assert.Contains("finalize-signpath-release.ps1", workflow);
+        Assert.Contains("finalize-signpath-installer.ps1", workflow);
+        Assert.Contains("win-x64.msi.sha256", workflow);
         Assert.Contains("Published as GitHub Release: no", workflow);
         Assert.DoesNotContain("contents: write", workflow);
         Assert.DoesNotContain("gh release", workflow, StringComparison.OrdinalIgnoreCase);

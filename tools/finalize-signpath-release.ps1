@@ -3,7 +3,8 @@ param(
     [Parameter(Mandatory)] [string]$Version,
     [Parameter(Mandatory)] [string]$ExpectedSourceCommit,
     [string]$ExpectedSourceBranch = "main",
-    [string]$OutputDirectory
+    [string]$OutputDirectory,
+    [string]$InstallerInputDirectory
 )
 
 $ErrorActionPreference = "Stop"
@@ -92,8 +93,12 @@ $manifest |
 if ([string]::IsNullOrWhiteSpace($OutputDirectory)) {
     $OutputDirectory = Join-Path $repoRoot "release-artifacts\app\signed"
 }
+if ([string]::IsNullOrWhiteSpace($InstallerInputDirectory)) {
+    $InstallerInputDirectory = Join-Path $repoRoot "release-artifacts\app\signpath-installer-input"
+}
 $outputRoot = [IO.Path]::GetFullPath($OutputDirectory)
-New-Item -ItemType Directory -Force -Path $outputRoot | Out-Null
+$installerInputRoot = [IO.Path]::GetFullPath($InstallerInputDirectory)
+New-Item -ItemType Directory -Force -Path $outputRoot, $installerInputRoot | Out-Null
 $zipPath = Join-Path $outputRoot "AirType-$Version-win-x64.zip"
 $checksumPath = Join-Path $outputRoot "AirType-$Version-win-x64.sha256"
 
@@ -111,9 +116,22 @@ if ($LASTEXITCODE -ne 0) {
     throw "Final SignPath release package verification failed."
 }
 
+$installerInputPath = Join-Path $installerInputRoot "AirType-$Version-win-x64-signing-input.msi"
+& powershell `
+    -NoProfile `
+    -ExecutionPolicy Bypass `
+    -File (Join-Path $PSScriptRoot "build-windows-installer.ps1") `
+    -PayloadDirectory $signedRoot `
+    -Version $Version `
+    -OutputPath $installerInputPath
+if ($LASTEXITCODE -ne 0) {
+    throw "SignPath installer signing input build failed."
+}
+
 Write-Host "SignPath release package finalized:"
 Write-Host "  Version:   $Version"
 Write-Host "  Commit:    $ExpectedSourceCommit"
 Write-Host "  Publisher: $signatureSubject"
 Write-Host "  Package:   $zipPath"
 Write-Host "  SHA-256:   $checksumPath"
+Write-Host "  MSI input: $installerInputPath"

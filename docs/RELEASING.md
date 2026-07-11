@@ -1,7 +1,8 @@
 # AirType Release Procedure
 
-This maintainer procedure produces the portable Windows x64 package and Local
-ASR release assets. An unsigned validation candidate is never a stable release.
+This maintainer procedure produces the Windows x64 MSI installer, matching
+portable ZIP, and Local ASR release assets. An unsigned validation candidate is
+never a stable release.
 
 ## Release Requirements
 
@@ -51,9 +52,9 @@ From a clean commit, run:
 .\tools\build-release.ps1 -Version 1.0.0
 ```
 
-The output name contains `-unsigned`. The script publishes self-contained,
+Both MSI and ZIP output names contain `-unsigned`. The script publishes self-contained,
 collects exact third-party license evidence, writes release provenance and
-checksums, and validates the ZIP in an isolated temporary directory.
+checksums, and validates both distributions in isolated temporary directories.
 
 Verify it independently:
 
@@ -61,6 +62,12 @@ Verify it independently:
 .\tools\verify-release-package.ps1 `
   -PackagePath .\release-artifacts\app\AirType-1.0.0-win-x64-unsigned.zip `
   -AllowUnsigned
+
+.\tools\verify-windows-installer.ps1 `
+  -PackagePath .\release-artifacts\app\AirType-1.0.0-win-x64-unsigned.msi `
+  -ExpectedVersion 1.0.0 `
+  -ExpectedInstallerSignatureStatus NotSigned `
+  -ExpectedPayloadSignatureStatus NotSigned
 ```
 
 Use this candidate for clean-machine testing and, when required, SignPath
@@ -90,8 +97,11 @@ result:
 .\tools\verify-clean-windows-candidate.ps1 `
   -AppPackagePath <app-zip> `
   -ExpectedAppSha256 <app-sha256> `
+  -InstallerPackagePath <app-msi> `
+  -ExpectedInstallerSha256 <installer-sha256> `
   -LocalAsrPackagePath <local-asr-zip> `
   -ExpectedLocalAsrSha256 <local-asr-sha256> `
+  -ExpectedVersion 1.0.0 `
   -OutputPath <evidence-json>
 ```
 
@@ -100,19 +110,22 @@ The `1.0.0` private candidate results and environment details are recorded in
 
 ## Clean-Machine Acceptance
 
-Test only the ZIP and checksum sidecar, never a developer build folder. On
+Test only the MSI, ZIP, and matching checksum sidecars, never a developer build folder. On
 clean Windows 10 x64 and Windows 11 x64 systems without .NET, Windows App SDK,
 or Python installed:
 
-1. Verify the checksum and expected signature state.
-2. Extract and launch against a new Windows profile.
-3. Restart and confirm Settings, History, Notes, and Dictionary persist.
-4. Install, use, remove, and reinstall Local ASR.
-5. Run cloud ASR and cleanup with dedicated test credentials.
-6. Verify hotkey, tray, startup, recording, cancellation, transcript insertion,
+1. Verify both checksums and expected signature states.
+2. Install the MSI, launch it, uninstall it without deleting user data, reinstall,
+   relaunch, and uninstall again.
+3. Extract and launch the portable ZIP against the same isolated Windows profile.
+4. Restart and confirm Settings, History, Notes, and Dictionary persist.
+5. Install, use, remove, and reinstall Local ASR.
+6. Run cloud ASR and cleanup with dedicated test credentials.
+7. Verify hotkey, tray, startup, recording, cancellation, transcript insertion,
    history rerun/source toggle/edit/delete, audio download, and Clear History.
-7. Verify light/dark themes, minimum size, and primary/secondary monitor window behavior.
-8. Confirm storage remains under `%LOCALAPPDATA%\AirType\` and uninstall cleanly.
+8. Verify light/dark themes, minimum size, and primary/secondary monitor window behavior.
+9. Confirm storage remains under `%LOCALAPPDATA%\AirType\` and application files
+   and Start menu shortcuts are removed by uninstall.
 
 Record the OS build, source commit, artifact hash, signature state, and result.
 
@@ -146,13 +159,14 @@ the form that will be signed. Enrollment therefore occurs only after the final
 private audit and explicit publication approval:
 
 1. Make the validated AirType repository public.
-2. Publish the exact accepted unsigned package as a clearly labeled GitHub
+2. Publish the exact accepted unsigned MSI and portable ZIP as a clearly labeled GitHub
    **pre-release**, not a stable release.
 3. Apply to SignPath Foundation and link the public AirType repository.
 4. Install the SignPath GitHub App for the repository and configure an AirType
-   project whose default artifact configuration accepts the GitHub artifact ZIP,
-   signs only `AirType.exe`, enforces product name `AirType`, and accepts a
-   required `version` parameter for product/file version restrictions.
+   project with one artifact configuration that signs only `AirType.exe` in the
+   staging tree and a second configuration that signs the MSI itself. Both
+   configurations enforce product name `AirType` and accept a required `version`
+   parameter for product/file version restrictions.
 5. Configure a signing policy with manual approval and assign the roles listed
    in [`../CODE_SIGNING_POLICY.md`](../CODE_SIGNING_POLICY.md).
 6. Configure the GitHub `release-signing` environment and these repository
@@ -161,17 +175,21 @@ private audit and explicit publication approval:
    - secret `SIGNPATH_API_TOKEN`;
    - variable `SIGNPATH_ORGANIZATION_ID`;
    - variable `SIGNPATH_PROJECT_SLUG`;
-   - variable `SIGNPATH_SIGNING_POLICY_SLUG`.
+   - variable `SIGNPATH_SIGNING_POLICY_SLUG`;
+   - variable `SIGNPATH_PAYLOAD_ARTIFACT_CONFIGURATION_SLUG`;
+   - variable `SIGNPATH_INSTALLER_ARTIFACT_CONFIGURATION_SLUG`.
 
 The manual `Sign release package` workflow runs only from `main`. It builds and
 validates the public snapshot, preserves the unsigned staging tree, uploads that
 tree to GitHub, submits its GitHub artifact ID to SignPath, waits for approval,
 and rejects the returned tree unless `AirType.exe` has a valid Authenticode
 signature from SignPath Foundation with matching clean-source provenance. It
-then creates and verifies the deterministic stable ZIP and uploads it as a
-workflow artifact. The workflow never creates a GitHub Release.
+then builds the MSI from that signed payload, submits the MSI through the second
+artifact configuration, and rejects it unless both the MSI and its embedded
+executable validate. The workflow uploads the verified ZIP, MSI, and sidecars;
+it never creates a GitHub Release.
 
-After signing, download the returned ZIP and checksum, record their exact hashes,
+After signing, download the returned ZIP, MSI, and checksums, record their exact hashes,
 and repeat Windows 10 and Windows 11 clean-machine acceptance. A byte change,
 rebuild, different signature, or different hash invalidates earlier acceptance.
 
@@ -185,16 +203,17 @@ $env:AIRTYPE_SIGNING_CERTIFICATE_THUMBPRINT = '<protected thumbprint>'
 ```
 
 After SignPath enrollment, use the manual `Sign release package` GitHub Actions
-workflow. It submits the GitHub-built staging artifact and runs
-`finalize-signpath-release.ps1` on the returned signed tree. In either the local
-or SignPath path, the signed executable must correspond to the tested source and
-release manifest. Any rebuild or byte change requires package verification and
+workflow. It signs the executable staging tree, runs
+`finalize-signpath-release.ps1`, signs the resulting installer, and runs
+`finalize-signpath-installer.ps1`. In either the local or SignPath path, the
+signed executable and MSI must correspond to the tested source and release
+manifest. Any rebuild or byte change requires package verification and
 clean-machine acceptance again.
 
 ## Publish
 
 Create a GitHub Release from the exact tested `main` commit. Upload the signed
-ZIP, checksum, Local ASR manifest/bundle/checksums, release notes, license,
+MSI, portable ZIP, both checksums, Local ASR manifest/bundle/checksums, release notes, license,
 privacy notice, installation guide, and generated third-party inventory.
 
 After upload, verify all assets from GitHub, test Local ASR installation through

@@ -14,6 +14,7 @@ public sealed class LocalAsrRuntimePreparationScriptTests
         string scriptPath = Path.Combine(repoRoot, "tools", "prepare-local-asr-runtime.ps1");
 
         string script = File.ReadAllText(scriptPath);
+        string wixTool = File.ReadAllText(Path.Combine(repoRoot, "tools", "wix-tool.ps1"));
 
         Assert.Contains("[string[]]$Models = @(\"small.en\")", script);
         Assert.Contains("[string]$PythonVersion = \"3.12.10\"", script);
@@ -29,12 +30,13 @@ public sealed class LocalAsrRuntimePreparationScriptTests
         Assert.Contains("AIRTYPE_PCM_ONLY_SHIM", script);
         Assert.Contains("Official Python embeddable package checksum mismatch.", script);
         Assert.Contains("local-asr-vc-runtime.lock.json", script);
-        Assert.Contains("$installOutput = @(& dotnet tool install wix", script);
-        Assert.Contains("$installExitCode = $LASTEXITCODE", script);
-        Assert.Contains("Write-Host $line", script);
-        Assert.Contains("function Test-PinnedWixVersion", script);
-        Assert.Contains("$Actual.Equals($Expected", script);
-        Assert.Contains("$Actual.StartsWith(\"$Expected+\"", script);
+        Assert.Contains("wix-tool.ps1", script);
+        Assert.Contains("$installOutput = @(& dotnet tool install wix", wixTool);
+        Assert.Contains("$installExitCode = $LASTEXITCODE", wixTool);
+        Assert.Contains("Write-Host $line", wixTool);
+        Assert.Contains("function Test-PinnedWixVersion", wixTool);
+        Assert.Contains("$Actual.Equals($Expected", wixTool);
+        Assert.Contains("$Actual.StartsWith(\"$Expected+\"", wixTool);
         Assert.Contains("burn extract", script);
         Assert.Contains("Get-AuthenticodeSignature", script);
         Assert.Contains("$signature.Status -ne [Management.Automation.SignatureStatus]::Valid", script);

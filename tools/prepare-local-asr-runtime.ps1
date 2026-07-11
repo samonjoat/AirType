@@ -23,6 +23,7 @@ $pythonArchiveUrl = "https://www.python.org/ftp/python/$PythonVersion/$pythonArc
 $pythonArchivePath = Join-Path $env:TEMP $pythonArchiveName
 $pythonArchiveSha256 = "4acbed6dd1c744b0376e3b1cf57ce906f9dc9e95e68824584c8099a63025a3c3"
 $vcRuntimeLockPath = Join-Path $PSScriptRoot "local-asr-vc-runtime.lock.json"
+. (Join-Path $PSScriptRoot "wix-tool.ps1")
 
 function Assert-FileSha256 {
     param(
@@ -38,51 +39,6 @@ function Assert-FileSha256 {
     if ($actual -ne $Expected) {
         throw "$Description checksum mismatch."
     }
-}
-
-function Test-PinnedWixVersion {
-    param(
-        [Parameter(Mandatory)] [string]$Actual,
-        [Parameter(Mandatory)] [string]$Expected
-    )
-
-    return $Actual.Equals($Expected, [StringComparison]::Ordinal) -or
-        $Actual.StartsWith("$Expected+", [StringComparison]::Ordinal)
-}
-
-function Get-PinnedWixExecutable {
-    param([Parameter(Mandatory)] [string]$Version)
-
-    $installed = Get-Command wix.exe -ErrorAction SilentlyContinue
-    if ($null -ne $installed) {
-        $installedVersion = (& $installed.Source --version | Select-Object -First 1).Trim()
-        if ($LASTEXITCODE -eq 0 -and (Test-PinnedWixVersion -Actual $installedVersion -Expected $Version)) {
-            return $installed.Source
-        }
-    }
-
-    $toolRoot = Join-Path $env:TEMP "AirTypeBuildTools\wix-$Version"
-    $toolExecutable = Join-Path $toolRoot "wix.exe"
-    if (!(Test-Path -LiteralPath $toolExecutable -PathType Leaf)) {
-        if (Test-Path -LiteralPath $toolRoot) {
-            Remove-Item -LiteralPath $toolRoot -Recurse -Force
-        }
-        New-Item -ItemType Directory -Force -Path $toolRoot | Out-Null
-        $installOutput = @(& dotnet tool install wix --tool-path $toolRoot --version $Version --no-cache)
-        $installExitCode = $LASTEXITCODE
-        foreach ($line in $installOutput) {
-            Write-Host $line
-        }
-        if ($installExitCode -ne 0) {
-            throw "Failed to install pinned WiX Toolset $Version."
-        }
-    }
-
-    $toolVersion = (& $toolExecutable --version | Select-Object -First 1).Trim()
-    if ($LASTEXITCODE -ne 0 -or !(Test-PinnedWixVersion -Actual $toolVersion -Expected $Version)) {
-        throw "Pinned WiX Toolset version validation failed."
-    }
-    return $toolExecutable
 }
 
 function Invoke-WixBurnExtract {

@@ -24,8 +24,9 @@ guaranteed.
 
 ## Release verification
 
-Official public packages are Authenticode signed and include a `.sha256`
-sidecar. Do not treat an artifact whose name contains `-unsigned` as an official
-public release. Verify the SHA-256 digest before running a downloaded package.
+Official public MSI packages and their embedded `AirType.exe` executables are
+Authenticode signed, and every distribution includes a SHA-256 sidecar. Do not
+treat an artifact whose name contains `-unsigned` as an official public release.
+Verify the SHA-256 digest and applicable signatures before running a downloaded package.
 The repository's [Code signing policy](CODE_SIGNING_POLICY.md) defines the
 signing scope, maintainers, approval, and build-origin controls.

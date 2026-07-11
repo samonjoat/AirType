@@ -46,6 +46,15 @@ public sealed class ReleaseAcceptanceSourceTests
         Assert.Contains("basePrefixEqualsPrefix", verifier);
         Assert.Contains("removalComplete", verifier);
         Assert.Contains("ExpectedSignatureStatus", verifier);
+        Assert.Contains("InstallerPackagePath", verifier);
+        Assert.Contains("ExpectedInstallerSha256", verifier);
+        Assert.Contains("Invoke-MsiTransaction", verifier);
+        Assert.Contains("WindowsBuiltInRole]::Administrator", verifier);
+        Assert.Contains("ProgramFiles", verifier);
+        Assert.Contains("AirType.lnk", verifier);
+        Assert.Contains("userDataRetained", verifier);
+        Assert.Contains("finalRemovalComplete", verifier);
+        Assert.Contains("schemaVersion = 2", verifier);
         Assert.Contains("WorkingDirectory must be a child", verifier);
         Assert.Contains("docs/release-acceptance/", snapshot);
     }

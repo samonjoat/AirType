@@ -1,0 +1,65 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+    Id="AirType.Windows.x64"
+    Name="AirType"
+    Manufacturer="AirType"
+    Version="$(Version)"
+    UpgradeCode="0CB1FBA8-B8E7-489F-8A10-56D1CBE441DF"
+    Language="1033"
+    Codepage="65001"
+    Scope="perMachine"
+    InstallerVersion="500"
+    Compressed="yes">
+    <SummaryInformation
+      Description="AirType voice dictation and transcription for Windows"
+      Manufacturer="AirType"
+      Keywords="AirType, dictation, transcription, speech to text" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of AirType is already installed." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Icon Id="AirTypeIcon" SourceFile="!(bindpath.Source)\AirType\airtype.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AirTypeIcon" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/samonjoat/AirType" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/samonjoat/AirType/issues" />
+    <Property Id="ARPNOMODIFY" Value="1" />
+    <SetProperty Id="ARPINSTALLLOCATION" Value="[INSTALLFOLDER]" After="CostFinalize" />
+
+    <Feature Id="Main" Title="AirType" Level="1">
+      <ComponentGroupRef Id="ApplicationFiles" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <ComponentGroup
+      Id="ApplicationFiles"
+      Directory="INSTALLFOLDER">
+      <Component>
+        <File Id="AirTypeExecutable" Source="!(bindpath.Payload)\AirType.exe" KeyPath="yes">
+          <Shortcut
+            Id="AirTypeStartMenuShortcut"
+            Directory="ShortcutFolder"
+            Name="AirType"
+            Description="Voice dictation and transcription"
+            WorkingDirectory="INSTALLFOLDER"
+            Advertise="yes" />
+        </File>
+        <RemoveFolder Id="RemoveShortcutFolder" Directory="ShortcutFolder" On="uninstall" />
+      </Component>
+
+      <Files Include="!(bindpath.Payload)\**">
+        <Exclude Files="!(bindpath.Payload)\AirType.exe" />
+      </Files>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="AirType" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ShortcutFolder" Name="AirType" />
+    </StandardDirectory>
+  </Fragment>
+</Wix>

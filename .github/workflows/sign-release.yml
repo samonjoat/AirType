@@ -52,6 +52,8 @@ jobs:
           SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
           SIGNPATH_PROJECT_SLUG: ${{ vars.SIGNPATH_PROJECT_SLUG }}
           SIGNPATH_SIGNING_POLICY_SLUG: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          SIGNPATH_PAYLOAD_ARTIFACT_CONFIGURATION_SLUG: ${{ vars.SIGNPATH_PAYLOAD_ARTIFACT_CONFIGURATION_SLUG }}
+          SIGNPATH_INSTALLER_ARTIFACT_CONFIGURATION_SLUG: ${{ vars.SIGNPATH_INSTALLER_ARTIFACT_CONFIGURATION_SLUG }}
         run: |
           if ($env:GITHUB_REF -ne 'refs/heads/main') {
             throw 'SignPath release signing must run from main.'
@@ -63,7 +65,9 @@ jobs:
             'SIGNPATH_API_TOKEN',
             'SIGNPATH_ORGANIZATION_ID',
             'SIGNPATH_PROJECT_SLUG',
-            'SIGNPATH_SIGNING_POLICY_SLUG')) {
+            'SIGNPATH_SIGNING_POLICY_SLUG',
+            'SIGNPATH_PAYLOAD_ARTIFACT_CONFIGURATION_SLUG',
+            'SIGNPATH_INSTALLER_ARTIFACT_CONFIGURATION_SLUG')) {
             if ([string]::IsNullOrWhiteSpace((Get-Item "env:$name").Value)) {
               throw "Required SignPath configuration is missing: $name"
             }
@@ -93,14 +97,15 @@ jobs:
           compression-level: 0
           retention-days: 1
 
-      - name: Submit SignPath signing request
-        id: submit-signing-request
+      - name: Submit SignPath payload signing request
+        id: submit-payload-signing-request
         uses: SignPath/github-action-submit-signing-request@b9d91eadd323de506c0c81cf0c7fe7438f3360fd # v2
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
           project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
           signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_PAYLOAD_ARTIFACT_CONFIGURATION_SLUG }}
           github-artifact-id: ${{ steps.upload-unsigned-staging.outputs.artifact-id }}
           wait-for-completion: true
           wait-for-completion-timeout-in-seconds: 3600
@@ -108,13 +113,49 @@ jobs:
           parameters: |
             version: ${{ toJSON(inputs.version) }}
 
-      - name: Finalize signed stable package
+      - name: Finalize signed payload and installer input
         shell: pwsh
         env:
           AIRTYPE_RELEASE_VERSION: ${{ inputs.version }}
         run: |
           .\tools\finalize-signpath-release.ps1 `
             -SignedArtifactDirectory .\release-artifacts\app\signpath-returned `
+            -Version $env:AIRTYPE_RELEASE_VERSION `
+            -ExpectedSourceCommit $env:GITHUB_SHA
+
+      - name: Upload installer signing input
+        id: upload-installer-input
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: AirType-${{ inputs.version }}-installer-signing-input
+          path: release-artifacts/app/signpath-installer-input/AirType-${{ inputs.version }}-win-x64-signing-input.msi
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
+
+      - name: Submit SignPath installer signing request
+        id: submit-installer-signing-request
+        uses: SignPath/github-action-submit-signing-request@b9d91eadd323de506c0c81cf0c7fe7438f3360fd # v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_INSTALLER_ARTIFACT_CONFIGURATION_SLUG }}
+          github-artifact-id: ${{ steps.upload-installer-input.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: release-artifacts/app/signpath-installer-returned
+          parameters: |
+            version: ${{ toJSON(inputs.version) }}
+
+      - name: Finalize signed Windows installer
+        shell: pwsh
+        env:
+          AIRTYPE_RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          .\tools\finalize-signpath-installer.ps1 `
+            -SignedArtifactDirectory .\release-artifacts\app\signpath-installer-returned `
             -Version $env:AIRTYPE_RELEASE_VERSION `
             -ExpectedSourceCommit $env:GITHUB_SHA
 
@@ -125,6 +166,8 @@ jobs:
           path: |
             release-artifacts/app/signed/AirType-${{ inputs.version }}-win-x64.zip
             release-artifacts/app/signed/AirType-${{ inputs.version }}-win-x64.sha256
+            release-artifacts/app/signed/AirType-${{ inputs.version }}-win-x64.msi
+            release-artifacts/app/signed/AirType-${{ inputs.version }}-win-x64.msi.sha256
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
@@ -133,8 +176,10 @@ jobs:
         shell: pwsh
         env:
           AIRTYPE_RELEASE_VERSION: ${{ inputs.version }}
-          SIGNING_REQUEST_URL: ${{ steps.submit-signing-request.outputs.signing-request-web-url }}
+          PAYLOAD_SIGNING_REQUEST_URL: ${{ steps.submit-payload-signing-request.outputs.signing-request-web-url }}
+          INSTALLER_SIGNING_REQUEST_URL: ${{ steps.submit-installer-signing-request.outputs.signing-request-web-url }}
         run: |
           "## AirType $env:AIRTYPE_RELEASE_VERSION signed package" >> $env:GITHUB_STEP_SUMMARY
-          "SignPath request: $env:SIGNING_REQUEST_URL" >> $env:GITHUB_STEP_SUMMARY
+          "Payload SignPath request: $env:PAYLOAD_SIGNING_REQUEST_URL" >> $env:GITHUB_STEP_SUMMARY
+          "Installer SignPath request: $env:INSTALLER_SIGNING_REQUEST_URL" >> $env:GITHUB_STEP_SUMMARY
           "Published as GitHub Release: no" >> $env:GITHUB_STEP_SUMMARY

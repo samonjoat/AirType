@@ -64,6 +64,9 @@ public sealed class PublicDocumentationSourceTests
 
         Assert.Contains("GitHub Releases", install);
         Assert.Contains("unsigned validation candidate", install);
+        Assert.Contains("win-x64.msi", install);
+        Assert.Contains("Installed apps", install);
+        Assert.Contains("intentionally preserves", install);
         Assert.Contains("SignPath Foundation", releasing);
         Assert.Contains("Do not label it stable", releasing);
         Assert.Contains("build-public-snapshot.ps1", releasing);
@@ -119,6 +122,9 @@ public sealed class PublicDocumentationSourceTests
         Assert.Contains("Code signing policy", security);
         Assert.Contains("SignPath Foundation Enrollment And Workflow", releasing);
         Assert.Contains("SIGNPATH_API_TOKEN", releasing);
+        Assert.Contains("SIGNPATH_PAYLOAD_ARTIFACT_CONFIGURATION_SLUG", releasing);
+        Assert.Contains("SIGNPATH_INSTALLER_ARTIFACT_CONFIGURATION_SLUG", releasing);
+        Assert.Contains("finalize-signpath-installer.ps1", releasing);
         Assert.Contains("/CODE_SIGNING_POLICY.md @samonjoat", codeOwners);
         Assert.Contains("/.github/workflows/ @samonjoat", codeOwners);
     }
