@@ -18,7 +18,6 @@ public class Logger : IDisposable
     private static readonly object _lock = new();
     
     private readonly string _logDirectory;
-    private readonly string _logFilePath;
     // PERFORMANCE: Using Channel<T> instead of ConcurrentQueue with polling
     // Channel provides efficient async waiting without CPU-wasting polling loops
     private readonly Channel<LogEntry> _logChannel;
@@ -52,10 +51,6 @@ public class Logger : IDisposable
         
         // Ensure directory exists
         Directory.CreateDirectory(_logDirectory);
-        
-        // Log file: App_YYYYMMDD.log
-        var logFileName = $"App_{DateTime.Now:yyyyMMdd}.log";
-        _logFilePath = Path.Combine(_logDirectory, logFileName);
         
         // PERFORMANCE: Channel provides efficient async waiting without polling
         _logChannel = Channel.CreateUnbounded<LogEntry>(new UnboundedChannelOptions
@@ -301,18 +296,20 @@ public class Logger : IDisposable
     {
         try
         {
+            string logFilePath = GetDailyLogFilePath(_logDirectory, DateTime.Now);
+
             // Check file size and rotate if needed
-            if (File.Exists(_logFilePath))
+            if (File.Exists(logFilePath))
             {
-                var fileInfo = new FileInfo(_logFilePath);
+                var fileInfo = new FileInfo(logFilePath);
                 if (fileInfo.Length > _maxLogFileSizeMb * 1024 * 1024)
                 {
-                    RotateLogFile();
+                    RotateLogFile(logFilePath);
                 }
             }
             
             var logLine = FormatLogEntry(entry) + Environment.NewLine;
-            await File.AppendAllTextAsync(_logFilePath, logLine);
+            await File.AppendAllTextAsync(logFilePath, logLine);
         }
         catch
         {
@@ -320,17 +317,15 @@ public class Logger : IDisposable
         }
     }
 
-    private void RotateLogFile()
+    private void RotateLogFile(string activeLogFilePath)
     {
         try
         {
-            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            var rotatedFileName = $"DictationApp_{timestamp}.log";
-            var rotatedFilePath = Path.Combine(_logDirectory, rotatedFileName);
+            string rotatedFilePath = GetUniqueRotatedLogFilePath(_logDirectory, DateTime.Now);
             
-            if (File.Exists(_logFilePath))
+            if (File.Exists(activeLogFilePath))
             {
-                File.Move(_logFilePath, rotatedFilePath);
+                File.Move(activeLogFilePath, rotatedFilePath);
             }
             
             CleanupOldLogFiles();
@@ -345,35 +340,79 @@ public class Logger : IDisposable
     {
         try
         {
-            var logFiles = Directory.GetFiles(_logDirectory, "DictationApp_*.log");
-            
-            if (logFiles.Length > _maxLogFiles)
-            {
-                // Sort by creation time and delete oldest
-                var sortedFiles = logFiles
-                    .Select(f => new FileInfo(f))
-                    .OrderBy(f => f.CreationTime)
-                    .ToArray();
-                
-                var filesToDelete = sortedFiles.Take(sortedFiles.Length - _maxLogFiles);
-                
-                foreach (var file in filesToDelete)
-                {
-                    try
-                    {
-                        file.Delete();
-                    }
-                    catch
-                    {
-                        // Ignore deletion errors
-                    }
-                }
-            }
+            CleanupOldLogFiles(
+                _logDirectory,
+                GetDailyLogFilePath(_logDirectory, DateTime.Now),
+                _maxLogFiles);
         }
         catch
         {
             // Ignore cleanup errors
         }
+    }
+
+    internal static string GetDailyLogFilePath(string logDirectory, DateTime timestamp)
+    {
+        return Path.Combine(logDirectory, $"App_{timestamp:yyyyMMdd}.log");
+    }
+
+    internal static string GetUniqueRotatedLogFilePath(string logDirectory, DateTime timestamp)
+    {
+        string stem = $"App_{timestamp:yyyyMMdd_HHmmss_fff}";
+        string candidate = Path.Combine(logDirectory, $"{stem}.log");
+        int collisionSuffix = 1;
+
+        while (File.Exists(candidate))
+        {
+            candidate = Path.Combine(logDirectory, $"{stem}_{collisionSuffix}.log");
+            collisionSuffix++;
+        }
+
+        return candidate;
+    }
+
+    internal static int CleanupOldLogFiles(
+        string logDirectory,
+        string activeLogFilePath,
+        int maxHistoricalFiles)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(maxHistoricalFiles);
+
+        if (!Directory.Exists(logDirectory))
+        {
+            return 0;
+        }
+
+        string activeFullPath = Path.GetFullPath(activeLogFilePath);
+        var filesToDelete = Directory
+            .EnumerateFiles(logDirectory, "App_*.log")
+            .Concat(Directory.EnumerateFiles(logDirectory, "DictationApp_*.log"))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Where(path => !string.Equals(
+                Path.GetFullPath(path),
+                activeFullPath,
+                StringComparison.OrdinalIgnoreCase))
+            .Select(path => new FileInfo(path))
+            .OrderByDescending(file => file.LastWriteTimeUtc)
+            .ThenByDescending(file => file.Name, StringComparer.OrdinalIgnoreCase)
+            .Skip(maxHistoricalFiles)
+            .ToArray();
+
+        int deletedCount = 0;
+        foreach (FileInfo file in filesToDelete)
+        {
+            try
+            {
+                file.Delete();
+                deletedCount++;
+            }
+            catch
+            {
+                // Logging failures must not terminate the application.
+            }
+        }
+
+        return deletedCount;
     }
 
     /// <summary>
@@ -401,12 +440,13 @@ public class Logger : IDisposable
                 }
             }
 
-            // If we need more entries, read from the log file
-            if (entries.Count < count && File.Exists(_logFilePath))
+            // If we need more entries, read from today's log file.
+            string logFilePath = GetDailyLogFilePath(_logDirectory, DateTime.Now);
+            if (entries.Count < count && File.Exists(logFilePath))
             {
                 try
                 {
-                    var lines = File.ReadAllLines(_logFilePath);
+                    var lines = File.ReadAllLines(logFilePath);
                     var neededCount = count - entries.Count;
                     var startIndex = Math.Max(0, lines.Length - neededCount);
 
@@ -448,10 +488,11 @@ public class Logger : IDisposable
             // Clear in-memory queue
             _logQueue.Clear();
             
-            // Truncate file if exists
-            if (File.Exists(_logFilePath))
+            // Truncate today's file if it exists.
+            string logFilePath = GetDailyLogFilePath(_logDirectory, DateTime.Now);
+            if (File.Exists(logFilePath))
             {
-                File.WriteAllText(_logFilePath, string.Empty);
+                File.WriteAllText(logFilePath, string.Empty);
             }
         }
         catch (Exception ex)
