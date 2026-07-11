@@ -49,12 +49,12 @@
                                     <!-- ===== NORMAL MODE DISPLAY ===== -->
                                     <StackPanel Orientation="Horizontal"
                                                 VerticalAlignment="Center"
-                                                Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisConverter}}">
+                                                Visibility="{Binding IsEditing, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
 
                                         <!-- For MODIFIED: Show red original with strikethrough -->
                                         <Border Style="{DynamicResource DiffTagOriginal}"
                                                 Margin="0,0,10,0"
-                                                Visibility="{Binding IsModified, Converter={StaticResource BoolToVisConverter}}">
+                                                Visibility="{Binding IsModified, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <TextBlock Text="{Binding OriginalText}"
                                                        Style="{DynamicResource DiffTextOriginal}"/>
                                         </Border>
@@ -62,7 +62,7 @@
                                         <!-- For ADDED: Show grey "NEW" tag -->
                                         <Border Style="{DynamicResource DiffTagNew}"
                                                 Margin="0,0,10,0"
-                                                Visibility="{Binding IsAdded, Converter={StaticResource BoolToVisConverter}}">
+                                                Visibility="{Binding IsAdded, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <TextBlock Text="NEW"
                                                        Style="{DynamicResource DiffTextNew}"/>
                                         </Border>
@@ -84,7 +84,7 @@
                                     <!-- ===== EDIT MODE DISPLAY ===== -->
                                     <StackPanel Orientation="Horizontal"
                                                 VerticalAlignment="Center"
-                                                Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisConverter}}">
+                                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}">
 
                                         <!-- Editable Original TextBox (red tinted) -->
                                         <TextBox Text="{Binding EditingOriginalText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -114,7 +114,7 @@
 
                                         <!-- Normal Mode: Edit + Remove -->
                                         <StackPanel Orientation="Horizontal"
-                                                    Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisConverter}}">
+                                                    Visibility="{Binding IsEditing, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                                             <Button Style="{DynamicResource DiffEditButton}"
                                                     AutomationProperties.Name="Edit detected correction"
                                                     Click="Edit_Click"
@@ -128,7 +128,7 @@
 
                                         <!-- Edit Mode: Save + Cancel -->
                                         <StackPanel Orientation="Horizontal"
-                                                    Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisConverter}}">
+                                                    Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <Button Style="{DynamicResource DiffSaveButton}"
                                                     AutomationProperties.Name="Save detected correction edit"
                                                     Click="SaveEdit_Click"

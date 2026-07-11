@@ -8,12 +8,6 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- MaterialDesign resources (must come first for PackIcon and other MD controls) -->
-                <!-- MD resources commented out to prevent startup crash. Dialog will use Path instead of PackIcon. -->
-                <!-- <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" /> -->
-                <!-- <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" /> -->
-                <!-- <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" /> -->
-
                 <!-- App theme and styles -->
                 <ResourceDictionary Source="Themes/LightTheme.xaml"/>
                 <ResourceDictionary Source="Themes/Generic.xaml"/>
@@ -32,14 +26,10 @@
             <!-- Converters -->
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:StringVisibilityConverter x:Key="StringVisibilityConverter"/>
-            <converters:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter"/>
             <converters:StringToBooleanConverter x:Key="StringToBooleanConverter"/>
             <converters:BooleanInverterConverter x:Key="BooleanInverterConverter"/>
             <converters:BooleanToOpacityConverter x:Key="BooleanToOpacityConverter"/>
             <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
-            <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisConverter"/> <!-- Alias for compatibility -->
-            <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/> <!-- WPF built-in converter -->
-            <converters:DummyConverter x:Key="DummyConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

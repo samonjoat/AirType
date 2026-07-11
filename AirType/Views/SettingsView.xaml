@@ -12,7 +12,6 @@
              d:DataContext="{d:DesignInstance viewmodels:SettingsViewModel}">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis"/>
         <conv:ApiKeyStatusDisplayConverter x:Key="ApiKeyStatusDisplayConverter"/>
         <conv:ApiKeyStatusKindConverter x:Key="ApiKeyStatusKindConverter"/>
 

@@ -6,7 +6,6 @@
 
     <converters:BottomRoundedClipConverter x:Key="BottomRoundedClipConverter"/>
 
-    <!-- Custom ComboBox Style (From WpfDictationUI) -->
     <Style x:Key="CustomComboBox" TargetType="ComboBox">
         <Setter Property="FontFamily" Value="{DynamicResource AppFont}"/>
         <Setter Property="Background" Value="{DynamicResource BgBrush}"/>
@@ -139,7 +138,6 @@
         </Setter>
     </Style>
     
-    <!-- Custom ComboBoxItem Style (From WpfDictationUI) -->
     <Style x:Key="CustomComboBoxItem" TargetType="ComboBoxItem">
         <Setter Property="FontFamily" Value="{DynamicResource AppFont}"/>
         <Setter Property="Background" Value="Transparent"/>
