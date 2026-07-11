@@ -155,6 +155,8 @@ public sealed class PublicDocumentationSourceTests
         Assert.DoesNotContain("InverseBoolToVisConverter", dialog);
         Assert.DoesNotContain("BoolToVisConverter", dialog);
         Assert.DoesNotContain("x:Key=\"InverseBoolToVis\"", settings);
+        Assert.DoesNotContain("{StaticResource InverseBoolToVis}", settings);
+        Assert.Contains("{StaticResource InverseBooleanToVisibilityConverter}", settings);
         Assert.DoesNotContain("WpfDictationUI", comboStyles);
         Assert.DoesNotContain("<PackageReference Include=\"MaterialDesignColors\"", project);
     }

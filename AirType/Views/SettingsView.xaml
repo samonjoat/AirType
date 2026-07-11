@@ -210,7 +210,7 @@
 
                             <Border Style="{DynamicResource SettingsDivider}"/>
 
-                            <Grid Visibility="{Binding IsHotkeyEditMode, Converter={StaticResource InverseBoolToVis}}">
+                            <Grid Visibility="{Binding IsHotkeyEditMode, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
