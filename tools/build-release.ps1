@@ -180,6 +180,8 @@ $releaseManifest |
 $artifactStem = "AirType-$Version-win-x64" + $(if ($signed) { "" } else { "-unsigned" })
 $zipPath = Join-Path $outputRoot "$artifactStem.zip"
 $checksumPath = Join-Path $outputRoot "$artifactStem.sha256"
+$installerPath = Join-Path $outputRoot "$artifactStem.msi"
+$installerChecksumPath = "$installerPath.sha256"
 New-AirTypeDeterministicZip -SourceDirectory $stagingRoot -DestinationPath $zipPath
 
 $zipHash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -194,6 +196,48 @@ try {
 }
 finally {
     $archive.Dispose()
+}
+
+Invoke-Checked `
+    -FilePath "powershell" `
+    -Arguments @(
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", (Join-Path $PSScriptRoot "build-windows-installer.ps1"),
+        "-PayloadDirectory", $stagingRoot,
+        "-Version", $Version,
+        "-OutputPath", $installerPath
+    ) `
+    -FailureMessage "Windows installer build failed."
+
+if ($signed) {
+    Invoke-Checked `
+        -FilePath $signTool `
+        -Arguments @("sign", "/sha1", $thumbprint, "/fd", "SHA256", "/tr", $TimestampUrl, "/td", "SHA256", $installerPath) `
+        -FailureMessage "Windows installer Authenticode signing failed."
+
+    $installerSignature = Get-AuthenticodeSignature -LiteralPath $installerPath
+    if ($installerSignature.Status -ne [System.Management.Automation.SignatureStatus]::Valid) {
+        throw "Windows installer signature verification failed: $($installerSignature.StatusMessage)"
+    }
+    $installerHash = (Get-FileHash -LiteralPath $installerPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    "$installerHash  $([IO.Path]::GetFileName($installerPath))" |
+        Set-Content -LiteralPath $installerChecksumPath -Encoding ASCII
+
+    Invoke-Checked `
+        -FilePath "powershell" `
+        -Arguments @(
+            "-NoProfile",
+            "-ExecutionPolicy", "Bypass",
+            "-File", (Join-Path $PSScriptRoot "verify-windows-installer.ps1"),
+            "-PackagePath", $installerPath,
+            "-ExpectedVersion", $Version,
+            "-ExpectedInstallerSignatureStatus", "Valid",
+            "-ExpectedPayloadSignatureStatus", "Valid",
+            "-ExpectedSourceCommit", $commit,
+            "-ExpectedSourceBranch", $branch
+        ) `
+        -FailureMessage "Signed Windows installer verification failed."
 }
 
 if (!$KeepStaging) {
@@ -218,5 +262,7 @@ Write-Host "AirType release package created:"
 Write-Host "  Version:  $Version"
 Write-Host "  Commit:   $commit"
 Write-Host "  Signed:   $signed"
-Write-Host "  Package:  $zipPath"
-Write-Host "  SHA-256:  $checksumPath"
+Write-Host "  ZIP:      $zipPath"
+Write-Host "  ZIP hash: $checksumPath"
+Write-Host "  MSI:      $installerPath"
+Write-Host "  MSI hash: $installerChecksumPath"

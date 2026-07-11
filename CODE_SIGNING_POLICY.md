@@ -5,7 +5,8 @@ by [SignPath Foundation](https://signpath.org/).
 
 ## Scope
 
-Official stable Windows packages contain an Authenticode-signed `AirType.exe`.
+Official stable Windows packages contain an Authenticode-signed `AirType.exe`,
+and the MSI installer is independently Authenticode signed.
 The AirType signing policy does not sign bundled third-party executables or
 libraries as though they were produced by AirType. Those components retain
 their upstream identities, licenses, and signature states.
@@ -31,9 +32,9 @@ manual approval through the configured SignPath signing policy.
   pass before a signing request is submitted.
 - The SignPath integration receives the GitHub artifact identifier directly
   from GitHub Actions and returns the signed artifact to the same workflow.
-- The finalizer requires a valid Authenticode signature whose signer subject
-  contains `SignPath Foundation`, matching release provenance, and a passing
-  strict package verification before producing the stable ZIP.
+- The finalizers require valid Authenticode signatures whose signer subjects
+  contain `SignPath Foundation`, matching release provenance, and passing strict
+  ZIP and MSI verification before producing stable artifacts.
 - The signing workflow uploads artifacts for maintainer review but does not
   create or publish a GitHub Release.
 
@@ -48,8 +49,8 @@ and user controls.
 
 ## Verification
 
-Stable releases include a SHA-256 sidecar. Users should verify both that digest
-and the extracted `AirType.exe` Authenticode signature as described in
+Stable releases include SHA-256 sidecars. Users should verify those digests and
+the MSI and extracted `AirType.exe` Authenticode signatures as described in
 [`docs/INSTALL.md`](docs/INSTALL.md). A signed package is not stable until its
 exact hash has passed the release-acceptance process and is published from the
 official AirType GitHub repository.

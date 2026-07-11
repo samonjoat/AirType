@@ -34,13 +34,15 @@ runtime installation requires downloading release/model files. Read
 
 ## Installation
 
-The supported Windows package is a self-contained x64 ZIP. It does not require
+The primary Windows package is a self-contained x64 MSI installer. A matching
+self-contained ZIP is available for portable use. Neither distribution requires
 a separate .NET Desktop Runtime, Windows App SDK, or Python installation.
 
 When a stable release is available, download it only from
 [GitHub Releases](https://github.com/samonjoat/AirType/releases), verify its
-SHA-256 sidecar and Authenticode signature, extract the entire ZIP, and run
-`AirType.exe`. See [`docs/INSTALL.md`](docs/INSTALL.md) for the complete process.
+SHA-256 sidecar and Authenticode signature, then run the MSI or extract the
+entire portable ZIP. See [`docs/INSTALL.md`](docs/INSTALL.md) for the complete
+process.
 
 ## Building From Source
 

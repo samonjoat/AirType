@@ -101,7 +101,7 @@ function Test-PublicSourcePath {
 
     foreach ($prefix in @(
         ".github/", "AirType/", "AirType.LocalAsrWorker/", "AirType.Tests/",
-        "docs/release-acceptance/", "tools/"
+        "docs/release-acceptance/", "packaging/", "tools/"
     )) {
         if ($normalized.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) {
             return $true
@@ -180,7 +180,7 @@ $allowedTopLevel = @(
     ".editorconfig", ".gitattributes", ".github", ".gitignore",
     "AirType", "AirType.LocalAsrWorker", "AirType.Tests", "AirType.sln",
     "CODE_OF_CONDUCT.md", "CODE_SIGNING_POLICY.md", "CONTRIBUTING.md", "DCO.txt", "docs", "global.json",
-    "LICENSE", "PRIVACY.md", "README.md", "SECURITY.md",
+    "LICENSE", "packaging", "PRIVACY.md", "README.md", "SECURITY.md",
     "THIRD_PARTY_NOTICES.md", "tools", "TRADEMARKS.md"
 )
 $unexpectedTopLevel = @(Get-ChildItem -LiteralPath $outputRoot -Force | Where-Object {
@@ -266,9 +266,14 @@ foreach ($requiredPath in @(
     ".github/CODEOWNERS",
     ".github/workflows/codeql.yml",
     ".github/workflows/sign-release.yml",
+    "packaging/windows/AirType.wxs",
     "tools/build-release.ps1",
+    "tools/build-windows-installer.ps1",
+    "tools/finalize-signpath-installer.ps1",
     "tools/finalize-signpath-release.ps1",
     "tools/release-archive.ps1",
+    "tools/verify-windows-installer.ps1",
+    "tools/wix-tool.ps1",
     "tools/build-public-snapshot.ps1",
     "tools/test.ps1"
 )) {

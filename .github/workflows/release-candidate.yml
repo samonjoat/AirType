@@ -85,6 +85,7 @@ jobs:
           $manifest = Get-Content ".\release-artifacts\app\staging\AirType-$env:AIRTYPE_RELEASE_VERSION-win-x64\release-manifest.json" -Raw -ErrorAction SilentlyContinue
           "## AirType $env:AIRTYPE_RELEASE_VERSION validation candidate" >> $env:GITHUB_STEP_SUMMARY
           "Unsigned: yes" >> $env:GITHUB_STEP_SUMMARY
+          "Formats: MSI installer and portable ZIP" >> $env:GITHUB_STEP_SUMMARY
           "Published as GitHub Release: no" >> $env:GITHUB_STEP_SUMMARY
           if ($manifest) { 'Release manifest generated before deterministic archive cleanup.' >> $env:GITHUB_STEP_SUMMARY }
 
@@ -95,6 +96,8 @@ jobs:
           path: |
             release-artifacts/app/AirType-${{ inputs.version }}-win-x64-unsigned.zip
             release-artifacts/app/AirType-${{ inputs.version }}-win-x64-unsigned.sha256
+            release-artifacts/app/AirType-${{ inputs.version }}-win-x64-unsigned.msi
+            release-artifacts/app/AirType-${{ inputs.version }}-win-x64-unsigned.msi.sha256
           if-no-files-found: error
           compression-level: 0
           retention-days: 14

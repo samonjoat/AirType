@@ -46,7 +46,38 @@ public sealed class ReleasePackagingSourceTests
         Assert.Contains("dirty = $gitStatus.Count -ne 0", script);
         Assert.Contains(".sha256", script);
         Assert.Contains("verify-release-package.ps1", script);
+        Assert.Contains("build-windows-installer.ps1", script);
+        Assert.Contains("verify-windows-installer.ps1", script);
+        Assert.Contains("$installerPath.sha256", script);
+        Assert.Contains("Windows installer Authenticode signing failed.", script);
         Assert.DoesNotContain("CertificatePassword", script);
+    }
+
+    [Fact]
+    public void WindowsInstaller_HasStableUpgradeIdentityAndStrictBuildVerification()
+    {
+        string authoring = File.ReadAllText(Path.Combine(
+            RepoRoot, "packaging", "windows", "AirType.wxs"));
+        string builder = File.ReadAllText(Path.Combine(
+            RepoRoot, "tools", "build-windows-installer.ps1"));
+        string verifier = File.ReadAllText(Path.Combine(
+            RepoRoot, "tools", "verify-windows-installer.ps1"));
+
+        Assert.Contains("UpgradeCode=\"0CB1FBA8-B8E7-489F-8A10-56D1CBE441DF\"", authoring);
+        Assert.Contains("<MajorUpgrade", authoring);
+        Assert.Contains("ProgramFiles64Folder", authoring);
+        Assert.Contains("AirTypeStartMenuShortcut", authoring);
+        Assert.Contains("<Files Include=\"!(bindpath.Payload)\\**\">", authoring);
+        Assert.Contains("Normalize-WindowsAppSdkMsiLanguageMetadata", builder);
+        Assert.Contains("SET ``Language`` = '1033'", builder);
+        Assert.Contains("$output.sha256", builder);
+        Assert.Contains("ExpectedInstallerSignatureStatus NotSigned", builder);
+        Assert.Contains("msi\", \"validate", verifier);
+        Assert.Contains("Start-Process", verifier);
+        Assert.Contains("-Wait", verifier);
+        Assert.Contains("$package.sha256", verifier);
+        Assert.Contains("payload signature state does not match", verifier);
+        Assert.Contains("payload source commit does not match", verifier);
     }
 
     [Fact]
@@ -65,11 +96,29 @@ public sealed class ReleasePackagingSourceTests
         Assert.Contains("release-manifest.json", finalizer);
         Assert.Contains("New-AirTypeDeterministicZip", finalizer);
         Assert.Contains("verify-release-package.ps1", finalizer);
+        Assert.Contains("build-windows-installer.ps1", finalizer);
         Assert.DoesNotContain("AllowUnsigned", finalizer);
         Assert.Contains("function New-AirTypeDeterministicZip", archive);
         Assert.Contains("Release archive destination must be outside", archive);
         Assert.Contains("CompressionLevel]::Optimal", archive);
         Assert.Contains("2000, 1, 1", archive);
+    }
+
+    [Fact]
+    public void SignPathInstallerFinalizer_RequiresFoundationSignatureAndStrictPayloadVerification()
+    {
+        string finalizer = File.ReadAllText(
+            Path.Combine(RepoRoot, "tools", "finalize-signpath-installer.ps1"));
+
+        Assert.Contains("SignPath installer finalization requires a clean git worktree", finalizer);
+        Assert.Contains("SignPath stable installers must originate from main", finalizer);
+        Assert.Contains("exactly one MSI", finalizer);
+        Assert.Contains("Get-AuthenticodeSignature", finalizer);
+        Assert.Contains("SignPath Foundation", finalizer);
+        Assert.Contains("verify-windows-installer.ps1", finalizer);
+        Assert.Contains("ExpectedInstallerSignatureStatus Valid", finalizer);
+        Assert.Contains("ExpectedPayloadSignatureStatus Valid", finalizer);
+        Assert.Contains("$packagePath.sha256", finalizer);
     }
 
     [Fact]
