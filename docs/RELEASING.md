@@ -9,6 +9,7 @@ ASR release assets. An unsigned validation candidate is never a stable release.
 - The .NET SDK pinned by `global.json` on Windows x64.
 - PowerShell, Python 3.12, and network access for dependency preparation/audits.
 - Passing GitHub Actions build, test, dependency, secret, and snapshot checks.
+- Passing CodeQL C# analysis after the repository becomes public.
 - Passing Windows 10 and Windows 11 clean-machine acceptance for the exact artifact.
 - A trusted Authenticode signature for a stable release.
 
@@ -114,6 +115,28 @@ or Python installed:
 8. Confirm storage remains under `%LOCALAPPDATA%\AirType\` and uninstall cleanly.
 
 Record the OS build, source commit, artifact hash, signature state, and result.
+
+## Public Security Cutover
+
+The committed CodeQL workflow is intentionally skipped while this personal
+repository is private because GitHub Code Security is not available without a
+paid private-repository license. It activates automatically when the repository
+becomes public.
+
+After changing visibility, but before publishing any release:
+
+1. Run the `CodeQL` workflow from `main` and confirm the `CodeQL (C#)` job
+   completes successfully.
+2. Resolve or explicitly triage every open code-scanning alert.
+3. Add `CodeQL (C#)` to the required `main` branch checks.
+4. Verify GitHub native secret scanning and private vulnerability reporting are
+   enabled for the public repository; keep the independent Gitleaks workflow.
+5. Re-run the final repository audit and confirm no required check is pending,
+   skipped, or failing.
+
+Do not enable CodeQL default setup in addition to this advanced workflow. The
+manual build captures generated WPF/C# source and is the authoritative AirType
+CodeQL configuration.
 
 ## SignPath Foundation Enrollment And Workflow
 

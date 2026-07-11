@@ -9,12 +9,12 @@ public sealed class GitHubAutomationSourceTests
         Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
 
     [Fact]
-    public void Workflows_UseReadOnlyPermissionsAndPinnedActions()
+    public void Workflows_RestrictPermissionsAndPinActions()
     {
         string workflowRoot = Path.Combine(RepoRoot, ".github", "workflows");
         string[] workflows = Directory.GetFiles(workflowRoot, "*.yml");
 
-        Assert.Equal(4, workflows.Length);
+        Assert.Equal(5, workflows.Length);
         foreach (string workflowPath in workflows)
         {
             string workflow = File.ReadAllText(workflowPath);
@@ -22,12 +22,34 @@ public sealed class GitHubAutomationSourceTests
             Assert.DoesNotContain("pull_request_target", workflow);
             Assert.DoesNotContain("contents: write", workflow);
             Assert.DoesNotContain("pull-requests: write", workflow);
+            if (!string.Equals(Path.GetFileName(workflowPath), "codeql.yml", StringComparison.OrdinalIgnoreCase))
+            {
+                Assert.DoesNotContain("security-events: write", workflow);
+            }
 
             foreach (Match match in Regex.Matches(workflow, @"uses:\s+[^\s@]+@([^\s#]+)"))
             {
                 Assert.Matches("^[0-9a-f]{40}$", match.Groups[1].Value);
             }
         }
+    }
+
+    [Fact]
+    public void CodeQlWorkflow_IsPinnedManualAndActivatesOnlyWhenPublic()
+    {
+        string workflow = ReadWorkflow("codeql.yml");
+
+        Assert.Contains("if: github.event.repository.private == false", workflow);
+        Assert.Contains("security-events: write", workflow);
+        Assert.Contains("runs-on: windows-2025", workflow);
+        Assert.Contains("languages: csharp", workflow);
+        Assert.Contains("build-mode: manual", workflow);
+        Assert.Contains("queries: security-extended", workflow);
+        Assert.Contains("dotnet clean .\\AirType\\AirType.csproj", workflow);
+        Assert.Contains("dotnet build .\\AirType\\AirType.csproj", workflow);
+        Assert.Contains("github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9", workflow);
+        Assert.Contains("github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e9", workflow);
+        Assert.DoesNotContain("github/codeql-action/autobuild", workflow);
     }
 
     [Fact]
