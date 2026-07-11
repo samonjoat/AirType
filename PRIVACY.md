@@ -74,9 +74,13 @@ Provider terms and controls can change independently of AirType.
 ## Retention and deletion
 
 The default audio-retention setting is **Never Delete**. Selecting 7, 30, or
-90 days deletes local WAV recordings older than that period, their matching
-transcription trace JSON, and application logs older than that period. Timed
-retention does **not** delete transcript-history rows from SQLite.
+90 days deletes local WAV recordings older than that period and their matching
+transcription trace JSON.
+Timed retention does **not** delete transcript-history rows from SQLite.
+
+Application diagnostic logs use a separate storage limit. AirType keeps the
+current daily application log and up to seven historical application logs.
+Older application logs are deleted on a best-effort basis.
 
 Deleting a History session removes that session's database row, managed audio
 file, and matching transcription trace. Clearing History performs that action
