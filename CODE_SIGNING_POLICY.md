@@ -16,12 +16,15 @@ They are not official stable releases.
 
 ## Team Roles
 
-- Committers and reviewers: [`@samonjoat`](https://github.com/samonjoat)
+- Authors and committers: [`@samonjoat`](https://github.com/samonjoat)
+- Reviewers: [`@samonjoat`](https://github.com/samonjoat)
 - Signing approvers: [`@samonjoat`](https://github.com/samonjoat)
 
 AirType is currently maintained by one person. Contributions from other people
 must be reviewed by the maintainer before merge. Every signing request requires
 manual approval through the configured SignPath signing policy.
+Every person assigned one of these roles must keep multi-factor authentication
+enabled for both GitHub and SignPath access.
 
 ## Build And Signing Controls
 

@@ -113,8 +113,10 @@ public sealed class PublicDocumentationSourceTests
         Assert.Contains("Free code signing provided by", policy);
         Assert.Contains("certificate", policy);
         Assert.Contains("SignPath Foundation", policy);
-        Assert.Contains("Committers and reviewers", policy);
+        Assert.Contains("Authors and committers", policy);
+        Assert.Contains("Reviewers", policy);
         Assert.Contains("Signing approvers", policy);
+        Assert.Contains("multi-factor authentication", policy);
         Assert.Contains("PRIVACY.md", policy);
         Assert.Contains("GitHub-hosted Windows runner", policy);
         Assert.Contains("CODE_SIGNING_POLICY.md", readme);
