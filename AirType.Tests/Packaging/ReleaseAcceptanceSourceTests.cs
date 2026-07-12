@@ -5,8 +5,9 @@ namespace AirType.Tests.Packaging;
 
 public sealed class ReleaseAcceptanceSourceTests
 {
-    private const string AppSha256 = "33cd18122376ddcd92294254ba599e797c0b9702e77a700a2a5844b4f9581c29";
-    private const string LocalAsrSha256 = "a6f05138713b2eae78cb573fe51c201731ad34ab06ed7d5b8cfc58491e646ac8";
+    private const string AppSha256 = "ae16ba175d0d0acb17bca02b84780bdb736db9eca23b6dc0116fe2347e0e7b1a";
+    private const string InstallerSha256 = "f238955190d9eb2ac4c143f81c1eb98ff84ca6fc7d46e2d08e8c751650f548b4";
+    private const string LocalAsrSha256 = "a508e64f52475628913515d339f1452f68ae3f43f47b6bb5424965bc0c093241";
 
     private static readonly string RepoRoot = Path.GetFullPath(
         Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
@@ -18,14 +19,15 @@ public sealed class ReleaseAcceptanceSourceTests
         JsonElement windows11 = ReadEvidence("windows-11.json");
 
         AssertEvidence(windows10, "10.0.19044", expectedWindowsAppRuntimeCount: 0);
-        AssertEvidence(windows11, "10.0.26200", expectedWindowsAppRuntimeCount: 1);
+        AssertEvidence(windows11, "10.0.26200", expectedWindowsAppRuntimeCount: 4);
 
         string report = File.ReadAllText(Path.Combine(
             RepoRoot, "docs", "release-acceptance", "1.0.0", "README.md"));
         Assert.Contains(AppSha256, report);
+        Assert.Contains(InstallerSha256, report);
         Assert.Contains(LocalAsrSha256, report);
-        Assert.Contains("150eef37825e0405194d9c6c49c475e53e20689c", report);
-        Assert.Contains("Screen Sketch, Alarms, and Teams depend on it", report);
+        Assert.Contains("f1537b335b57a003a9050f69b3e4d8b6dbe836e9", report);
+        Assert.Contains("29166944421", report);
         Assert.Contains("remain private", report);
     }
 
@@ -72,7 +74,7 @@ public sealed class ReleaseAcceptanceSourceTests
         string expectedOsVersion,
         int expectedWindowsAppRuntimeCount)
     {
-        Assert.Equal(1, evidence.GetProperty("schemaVersion").GetInt32());
+        Assert.Equal(2, evidence.GetProperty("schemaVersion").GetInt32());
         Assert.Equal(expectedOsVersion, evidence.GetProperty("os").GetProperty("version").GetString());
 
         JsonElement environment = evidence.GetProperty("cleanEnvironment");
@@ -88,6 +90,16 @@ public sealed class ReleaseAcceptanceSourceTests
         Assert.Equal("NotSigned", app.GetProperty("signatureStatus").GetString());
         Assert.True(app.GetProperty("firstLaunch").GetProperty("mainWindowHandle").GetInt64() > 0);
         Assert.True(app.GetProperty("restart").GetProperty("mainWindowHandle").GetInt64() > 0);
+
+        JsonElement installer = evidence.GetProperty("installer");
+        Assert.Equal(InstallerSha256, installer.GetProperty("sha256").GetString());
+        Assert.Equal("NotSigned", installer.GetProperty("signatureStatus").GetString());
+        Assert.Equal("NotSigned", installer.GetProperty("installedExecutableSignatureStatus").GetString());
+        Assert.Equal("1.0.0.0", installer.GetProperty("fileVersion").GetString());
+        Assert.True(installer.GetProperty("firstLaunch").GetProperty("mainWindowHandle").GetInt64() > 0);
+        Assert.True(installer.GetProperty("reinstallLaunch").GetProperty("mainWindowHandle").GetInt64() > 0);
+        Assert.True(installer.GetProperty("userDataRetained").GetBoolean());
+        Assert.True(installer.GetProperty("finalRemovalComplete").GetBoolean());
 
         JsonElement localAsr = evidence.GetProperty("localAsr");
         Assert.Equal(LocalAsrSha256, localAsr.GetProperty("sha256").GetString());
