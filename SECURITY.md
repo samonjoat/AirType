@@ -3,8 +3,10 @@
 ## Supported versions
 
 Security fixes are provided for the latest published stable AirType release.
-Pre-release, development, and unsigned builds are not supported for production
-use.
+Pre-release and development builds are not supported for production use. The
+current stable Windows release is explicitly unsigned; its support status comes
+from publication on the official AirType GitHub Releases page, not from an
+Authenticode signature.
 
 ## Reporting a vulnerability
 
@@ -24,9 +26,13 @@ guaranteed.
 
 ## Release verification
 
-Official public MSI packages and their embedded `AirType.exe` executables are
-Authenticode signed, and every distribution includes a SHA-256 sidecar. Do not
-treat an artifact whose name contains `-unsigned` as an official public release.
-Verify the SHA-256 digest and applicable signatures before running a downloaded package.
-The repository's [Code signing policy](CODE_SIGNING_POLICY.md) defines the
-signing scope, maintainers, approval, and build-origin controls.
+AirType 1.0.0 MSI and portable ZIP packages are not Authenticode signed. Their
+official filenames contain `-unsigned`, and every distribution includes a
+SHA-256 sidecar. Verify the GitHub Release URL and digest before running a
+downloaded package. A missing signature is expected for 1.0.0, but a checksum
+mismatch, unofficial source, or Windows malware detection is not.
+
+Do not disable Microsoft Defender, SmartScreen, Smart App Control, or managed
+security policy globally to run AirType. The repository's
+[release integrity and code signing policy](CODE_SIGNING_POLICY.md) defines the
+current signature status, maintainer approval, and build-origin controls.

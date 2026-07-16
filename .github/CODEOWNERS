@@ -2,9 +2,7 @@
 
 /.github/workflows/ @samonjoat
 /tools/build-release.ps1 @samonjoat
-/tools/finalize-signpath-release.ps1 @samonjoat
 /tools/build-windows-installer.ps1 @samonjoat
-/tools/finalize-signpath-installer.ps1 @samonjoat
 /tools/verify-windows-installer.ps1 @samonjoat
 /tools/wix-tool.ps1 @samonjoat
 /packaging/windows/ @samonjoat

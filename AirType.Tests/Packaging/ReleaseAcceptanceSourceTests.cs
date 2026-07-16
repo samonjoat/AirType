@@ -28,7 +28,8 @@ public sealed class ReleaseAcceptanceSourceTests
         Assert.Contains(LocalAsrSha256, report);
         Assert.Contains("f1537b335b57a003a9050f69b3e4d8b6dbe836e9", report);
         Assert.Contains("29166944421", report);
-        Assert.Contains("remain private", report);
+        Assert.Contains("approved these exact bytes for stable unsigned publication", report);
+        Assert.Contains("requires new exact-package acceptance", report);
     }
 
     [Fact]

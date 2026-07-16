@@ -15,14 +15,14 @@ install .NET, the .NET Desktop Runtime, Windows App SDK, or Python separately.
 Official artifacts are published only on the
 [AirType GitHub Releases page](https://github.com/samonjoat/AirType/releases).
 
-- `AirType-<version>-win-x64.msi` is the signed stable installer.
-- `AirType-<version>-win-x64.zip` is the signed stable portable package.
-- Names containing `-unsigned` identify unsigned validation candidates in the
-  same MSI or ZIP format.
+- `AirType-<version>-win-x64-unsigned.msi` is the current stable installer.
+- `AirType-<version>-win-x64-unsigned.zip` is the current stable portable package.
+- The `-unsigned` suffix is intentional and means neither the package nor
+  `AirType.exe` has an AirType Authenticode signature.
 
-Unsigned candidates are for release testing. They are not supported stable
-releases and may trigger stronger Windows warnings. Do not obtain AirType from
-third-party download sites.
+An unsigned package is official only when it is attached to a stable release in
+the `samonjoat/AirType` repository and matches its published SHA-256 digest.
+Do not obtain AirType from third-party download sites.
 
 ## Verify The Download
 
@@ -30,25 +30,47 @@ Each artifact has a matching SHA-256 sidecar. The MSI sidecar appends
 `.sha256`; the ZIP sidecar replaces `.zip` with `.sha256`. In PowerShell:
 
 ```powershell
-$zip = '.\AirType-1.0.0-win-x64.zip'
+$zip = '.\AirType-1.0.0-win-x64-unsigned.zip'
 (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
 Get-Content ([IO.Path]::ChangeExtension($zip, '.sha256'))
 
-$msi = '.\AirType-1.0.0-win-x64.msi'
+$msi = '.\AirType-1.0.0-win-x64-unsigned.msi'
 (Get-FileHash $msi -Algorithm SHA256).Hash.ToLowerInvariant()
 Get-Content "$msi.sha256"
 ```
 
-The first value in each sidecar must equal the calculated hash. For a stable
-release, open the MSI properties and confirm its **Digital Signatures** tab
-reports a valid publisher matching the release notes. The installed or extracted
-`AirType.exe` must have the same valid publisher. Stop if either signature is
-missing or invalid, or if a checksum differs. See the project
-[Code signing policy](../CODE_SIGNING_POLICY.md) for signing scope and controls.
+The first value in each sidecar must equal the calculated hash and the digest
+printed in the GitHub Release notes. AirType 1.0.0 is expected to have no
+**Digital Signatures** tab and to report `NotSigned` or `Unknown publisher`.
+Stop if a checksum differs. See the project
+[release integrity and code signing policy](../CODE_SIGNING_POLICY.md).
+
+## Windows Security Warnings
+
+Because AirType is currently unsigned, Windows may show one or both of these:
+
+- **Microsoft Defender SmartScreen prevented an unrecognized app from starting**;
+- a User Account Control prompt whose verified publisher is **Unknown**.
+
+These warnings indicate missing publisher identity or reputation. They do not
+mean Microsoft verified the package as safe, and they are different from a
+malware or potentially unwanted application detection.
+
+Continue only after downloading from the official GitHub Release and matching
+the SHA-256 digest. For the SmartScreen reputation dialog, choose **More info**,
+confirm the app is AirType, then choose **Run anyway**. For an unsigned MSI UAC
+prompt, confirm the expected filename before choosing **Yes**.
+
+Do not continue if the hash differs, the file came from another location, the
+dialog names another application, or Windows reports malware or a potentially
+unwanted application. Do not disable Defender, SmartScreen, Smart App Control,
+or an organization's security policy globally. On a managed computer that
+blocks unsigned software, stop and ask the administrator rather than bypassing
+the policy.
 
 ## Install And Start
 
-1. Verify and run `AirType-<version>-win-x64.msi` from an administrator account.
+1. Verify and run `AirType-<version>-win-x64-unsigned.msi` from an administrator account.
 2. Start AirType from the Windows Start menu.
 3. Grant microphone permission when Windows requests it.
 4. Open Settings and choose an input device.
@@ -101,6 +123,8 @@ closed. Removing local files does not delete data retained by cloud providers.
 - Missing adjacent DLL or runtime errors usually mean the ZIP was not fully extracted.
 - MSI installation requires administrator permission and writes application files
   under `%ProgramFiles%\AirType`.
+- `Unknown publisher` or an unrecognized-app SmartScreen warning is expected for
+  the current unsigned release; a malware detection or checksum mismatch is not.
 - A disabled Local ASR download button means the release has no valid install source.
 - A Local ASR 404 before launch publication is expected because private GitHub
   Release assets are unavailable to AirType's unauthenticated downloader.

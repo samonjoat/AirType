@@ -2,6 +2,7 @@ param(
     [string]$Version = "1.0.0",
     [string]$OutputDirectory,
     [switch]$PublicRelease,
+    [switch]$AllowUnsignedPublicRelease,
     [string]$CertificateThumbprint = $env:AIRTYPE_SIGNING_CERTIFICATE_THUMBPRINT,
     [string]$TimestampUrl = "http://timestamp.digicert.com",
     [switch]$SkipRuntimePreparation,
@@ -80,6 +81,10 @@ $branch = (git -C $repoRoot branch --show-current).Trim()
 $commit = (git -C $repoRoot rev-parse HEAD).Trim()
 $sourceDateUtc = (git -C $repoRoot show -s --format=%cI HEAD).Trim()
 
+if ($AllowUnsignedPublicRelease -and !$PublicRelease) {
+    throw "AllowUnsignedPublicRelease requires PublicRelease."
+}
+
 if ($PublicRelease) {
     if ($gitStatus.Count -ne 0) {
         throw "Public release requires a clean git worktree."
@@ -87,8 +92,8 @@ if ($PublicRelease) {
     if ($branch -ne "main") {
         throw "Public release must be built from main."
     }
-    if ([string]::IsNullOrWhiteSpace($CertificateThumbprint)) {
-        throw "Public release requires AIRTYPE_SIGNING_CERTIFICATE_THUMBPRINT or -CertificateThumbprint."
+    if ([string]::IsNullOrWhiteSpace($CertificateThumbprint) -and !$AllowUnsignedPublicRelease) {
+        throw "Public release requires a signing certificate or explicit -AllowUnsignedPublicRelease."
     }
 }
 
@@ -155,8 +160,8 @@ if (![string]::IsNullOrWhiteSpace($CertificateThumbprint)) {
     $signatureSubject = $signature.SignerCertificate.Subject
 }
 
-if ($PublicRelease -and !$signed) {
-    throw "Public release cannot continue with an unsigned executable."
+if ($PublicRelease -and !$signed -and !$AllowUnsignedPublicRelease) {
+    throw "Public release cannot continue unsigned without -AllowUnsignedPublicRelease."
 }
 
 $exeHash = (Get-FileHash -LiteralPath $airTypeExe -Algorithm SHA256).Hash.ToLowerInvariant()

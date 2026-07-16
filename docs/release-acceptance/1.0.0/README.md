@@ -1,7 +1,9 @@
 # AirType 1.0.0 Clean Windows Acceptance
 
-Status: passed for the private unsigned release candidate. This is not a public
-release approval or a claim that the executable is signed.
+Status: passed for the exact unsigned release candidate. On 2026-07-16 the
+maintainer approved these exact bytes for stable unsigned publication after
+trusted community signing proved unavailable. This is not a claim that the
+executable or installer is signed.
 
 ## Candidate
 
@@ -64,7 +66,7 @@ verifier additionally observed nonzero top-level handles for installed,
 reinstalled, first portable, and restarted portable launches in both operating
 systems.
 
-## Scope And Remaining Gates
+## Scope And Publication Decision
 
 The clean VMs validate MSI lifecycle and data retention, portable packaging,
 first launch/restart, Local ASR inference, and removal. Cloud-provider calls were
@@ -72,8 +74,14 @@ intentionally excluded because no private credentials were copied into the VMs;
 those workflows and the full application UI were tested separately before this
 candidate was built.
 
-The repository and candidate remain private. Before public visibility or a
-stable GitHub Release, the replacement repository must pass the final private
-audit, public-only GitHub security checks must pass after visibility cutover,
-the final release artifact must satisfy the signing policy, and the maintainer
-must give explicit publication approval.
+The public replacement repository passed CI, CodeQL, dependency, secret,
+provenance, and snapshot gates with zero open GitHub security alerts. SignPath
+Foundation declined free signing because the newly public project does not yet
+have enough external adoption and visibility, not because of a reported
+technical or security defect.
+
+The maintainer therefore approved promotion of only the exact hashes recorded
+above as stable version 1.0.0. Package names retain `-unsigned`; release notes
+must explain expected Windows publisher/reputation warnings and require users
+to verify the official GitHub origin and SHA-256 digest before execution. Any
+rebuild or byte change requires new exact-package acceptance.

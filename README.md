@@ -5,9 +5,10 @@ records from a selected microphone, transcribes locally or through a configured
 cloud provider, optionally cleans the transcript, and inserts the result into
 the active application.
 
-> **Release status:** AirType is preparing its first public release. There is
-> currently no supported stable binary. Files whose names contain `-unsigned`
-> are validation candidates, not stable releases.
+> **Release status:** AirType's official Windows packages are currently
+> distributed without an Authenticode signature. Stable MSI and ZIP filenames
+> retain `-unsigned` so their signature status is never hidden. Download only
+> from this repository's Releases page and verify the published SHA-256 digest.
 
 ## Features
 
@@ -38,11 +39,12 @@ The primary Windows package is a self-contained x64 MSI installer. A matching
 self-contained ZIP is available for portable use. Neither distribution requires
 a separate .NET Desktop Runtime, Windows App SDK, or Python installation.
 
-When a stable release is available, download it only from
-[GitHub Releases](https://github.com/samonjoat/AirType/releases), verify its
-SHA-256 sidecar and Authenticode signature, then run the MSI or extract the
-entire portable ZIP. See [`docs/INSTALL.md`](docs/INSTALL.md) for the complete
-process.
+Download only from
+[GitHub Releases](https://github.com/samonjoat/AirType/releases) and verify the
+matching SHA-256 sidecar before running the MSI or extracting the portable ZIP.
+Because current packages are unsigned, Windows may show `Unknown publisher` or
+a Microsoft Defender SmartScreen reputation warning. See
+[`docs/INSTALL.md`](docs/INSTALL.md) before choosing to run the package.
 
 ## Building From Source
 
@@ -93,11 +95,13 @@ Python or the Visual C++ Redistributable globally.
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for service boundaries and
 the transcription data flow.
 
-## Code Signing Policy
+## Release Integrity And Code Signing
 
-Official stable packages follow the [AirType Code Signing Policy](CODE_SIGNING_POLICY.md).
-Free code signing is provided by SignPath.io, with the certificate provided by
-SignPath Foundation. Unsigned validation candidates are never stable releases.
+Current official packages are explicitly unsigned and follow the
+[AirType Release Integrity and Code Signing Policy](CODE_SIGNING_POLICY.md).
+AirType does not claim endorsement or signing services from SignPath. Stable
+unsigned package names retain `-unsigned`, include SHA-256 sidecars, and must
+match the exact hashes documented in their GitHub Release notes.
 
 ## Contributing And Security
 

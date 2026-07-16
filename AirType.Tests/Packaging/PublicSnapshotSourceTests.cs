@@ -36,7 +36,8 @@ public sealed class PublicSnapshotSourceTests
         Assert.Contains("Generated validation directories remain", script);
         Assert.Contains("\"packaging/\"", script);
         Assert.Contains("\"packaging/windows/AirType.wxs\"", script);
-        Assert.Contains("\"tools/finalize-signpath-installer.ps1\"", script);
+        Assert.Contains("\".github/workflows/unsigned-stable-release.yml\"", script);
+        Assert.DoesNotContain("finalize-signpath", script);
         Assert.Contains("\"tools/verify-windows-installer.ps1\"", script);
     }
 

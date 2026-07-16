@@ -43,7 +43,7 @@ public sealed class PublicDocumentationSourceTests
     {
         string readme = File.ReadAllText(Path.Combine(RepoRoot, "README.md"));
 
-        Assert.Contains("currently no supported stable binary", readme);
+        Assert.Contains("distributed without an Authenticode signature", readme);
         Assert.Contains("Local ASR", readme);
         Assert.Contains("AGPL-3.0-only", readme);
         Assert.Contains("does not", readme);
@@ -57,18 +57,23 @@ public sealed class PublicDocumentationSourceTests
     }
 
     [Fact]
-    public void ReleaseGuidance_DistinguishesUnsignedCandidateFromSignedStable()
+    public void ReleaseGuidance_ExplainsSupportedUnsignedStablePackages()
     {
         string install = File.ReadAllText(Path.Combine(RepoRoot, "docs", "INSTALL.md"));
         string releasing = File.ReadAllText(Path.Combine(RepoRoot, "docs", "RELEASING.md"));
 
         Assert.Contains("GitHub Releases", install);
-        Assert.Contains("unsigned validation candidate", install);
-        Assert.Contains("win-x64.msi", install);
+        Assert.Contains("current stable installer", install);
+        Assert.Contains("win-x64-unsigned.msi", install);
+        Assert.Contains("Windows Security Warnings", install);
+        Assert.Contains("Run anyway", install);
+        Assert.Contains("Do not disable Defender", install);
         Assert.Contains("Installed apps", install);
         Assert.Contains("intentionally preserves", install);
-        Assert.Contains("SignPath Foundation", releasing);
-        Assert.Contains("Do not label it stable", releasing);
+        Assert.Contains("Exact-Byte Promotion For 1.0.0", releasing);
+        Assert.Contains("does not yet have enough external adoption", releasing);
+        Assert.Contains("Do not claim", releasing);
+        Assert.Contains("-AllowUnsignedPublicRelease", releasing);
         Assert.Contains("build-public-snapshot.ps1", releasing);
         Assert.Contains(".\\tools\\test.ps1", releasing);
         Assert.Contains(".\\tools\\audit-dependencies.ps1", releasing);
@@ -101,7 +106,7 @@ public sealed class PublicDocumentationSourceTests
     }
 
     [Fact]
-    public void CodeSigningPolicy_DeclaresFoundationCreditRolesPrivacyAndBuildControls()
+    public void ReleaseIntegrityPolicy_DeclaresUnsignedStatusVerificationAndBuildControls()
     {
         string policy = File.ReadAllText(Path.Combine(RepoRoot, "CODE_SIGNING_POLICY.md"));
         string readme = File.ReadAllText(Path.Combine(RepoRoot, "README.md"));
@@ -110,23 +115,20 @@ public sealed class PublicDocumentationSourceTests
         string releasing = File.ReadAllText(Path.Combine(RepoRoot, "docs", "RELEASING.md"));
         string codeOwners = File.ReadAllText(Path.Combine(RepoRoot, ".github", "CODEOWNERS"));
 
-        Assert.Contains("Free code signing provided by", policy);
-        Assert.Contains("certificate", policy);
-        Assert.Contains("SignPath Foundation", policy);
-        Assert.Contains("Authors and committers", policy);
-        Assert.Contains("Reviewers", policy);
-        Assert.Contains("Signing approvers", policy);
+        Assert.Contains("AirType 1.0.0 Windows packages are not Authenticode signed", policy);
+        Assert.Contains("does not claim that SignPath.io signs", policy);
+        Assert.Contains("-unsigned", policy);
+        Assert.Contains("SHA-256", policy);
+        Assert.Contains("AllowUnsignedPublicRelease", policy);
+        Assert.Contains("f1537b3", policy);
         Assert.Contains("multi-factor authentication", policy);
         Assert.Contains("PRIVACY.md", policy);
-        Assert.Contains("GitHub-hosted Windows runner", policy);
         Assert.Contains("CODE_SIGNING_POLICY.md", readme);
-        Assert.Contains("Code signing policy", install);
-        Assert.Contains("Code signing policy", security);
-        Assert.Contains("SignPath Foundation Enrollment And Workflow", releasing);
-        Assert.Contains("SIGNPATH_API_TOKEN", releasing);
-        Assert.Contains("SIGNPATH_PAYLOAD_ARTIFACT_CONFIGURATION_SLUG", releasing);
-        Assert.Contains("SIGNPATH_INSTALLER_ARTIFACT_CONFIGURATION_SLUG", releasing);
-        Assert.Contains("finalize-signpath-installer.ps1", releasing);
+        Assert.Contains("release integrity and code signing policy", install, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("release integrity and code signing policy", security, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Exact-Byte Promotion For 1.0.0", releasing);
+        Assert.DoesNotContain("SIGNPATH_API_TOKEN", releasing);
+        Assert.DoesNotContain("finalize-signpath", releasing);
         Assert.Contains("/CODE_SIGNING_POLICY.md @samonjoat", codeOwners);
         Assert.Contains("/.github/workflows/ @samonjoat", codeOwners);
     }
