@@ -29,12 +29,14 @@ public sealed class ReleasePackagingSourceTests
     }
 
     [Fact]
-    public void ReleaseScript_RequiresSigningForPublicReleaseAndLabelsUnsignedPackages()
+    public void ReleaseScript_RequiresExplicitOptInAndLabelsUnsignedPublicPackages()
     {
         string script = File.ReadAllText(Path.Combine(RepoRoot, "tools", "build-release.ps1"));
 
         Assert.Contains("Public release requires a clean git worktree.", script);
         Assert.Contains("Public release must be built from main.", script);
+        Assert.Contains("AllowUnsignedPublicRelease requires PublicRelease.", script);
+        Assert.Contains("explicit -AllowUnsignedPublicRelease", script);
         Assert.Contains("AIRTYPE_SIGNING_CERTIFICATE_THUMBPRINT", script);
         Assert.Contains("Get-AuthenticodeSignature", script);
         Assert.Contains("-unsigned", script);
@@ -81,44 +83,23 @@ public sealed class ReleasePackagingSourceTests
     }
 
     [Fact]
-    public void SignPathFinalizer_IsFailClosedAndUsesSharedDeterministicArchive()
+    public void RetiredSignPathFinalizersAndWorkflow_AreAbsent()
     {
-        string finalizer = File.ReadAllText(
-            Path.Combine(RepoRoot, "tools", "finalize-signpath-release.ps1"));
+        Assert.False(File.Exists(Path.Combine(RepoRoot, "tools", "finalize-signpath-release.ps1")));
+        Assert.False(File.Exists(Path.Combine(RepoRoot, "tools", "finalize-signpath-installer.ps1")));
+        Assert.False(File.Exists(Path.Combine(RepoRoot, ".github", "workflows", "sign-release.yml")));
+        Assert.True(File.Exists(Path.Combine(RepoRoot, ".github", "workflows", "unsigned-stable-release.yml")));
+    }
+
+    [Fact]
+    public void ReleaseArchive_IsDeterministicAndDestinationSafe()
+    {
         string archive = File.ReadAllText(Path.Combine(RepoRoot, "tools", "release-archive.ps1"));
 
-        Assert.Contains("SignPath finalization requires a clean git worktree", finalizer);
-        Assert.Contains("SignPath stable packages must originate from main", finalizer);
-        Assert.Contains("release manifest is missing dirty provenance", finalizer);
-        Assert.Contains("dirty provenance is not Boolean", finalizer);
-        Assert.Contains("Get-AuthenticodeSignature", finalizer);
-        Assert.Contains("SignPath Foundation", finalizer);
-        Assert.Contains("release-manifest.json", finalizer);
-        Assert.Contains("New-AirTypeDeterministicZip", finalizer);
-        Assert.Contains("verify-release-package.ps1", finalizer);
-        Assert.Contains("build-windows-installer.ps1", finalizer);
-        Assert.DoesNotContain("AllowUnsigned", finalizer);
         Assert.Contains("function New-AirTypeDeterministicZip", archive);
         Assert.Contains("Release archive destination must be outside", archive);
         Assert.Contains("CompressionLevel]::Optimal", archive);
         Assert.Contains("2000, 1, 1", archive);
-    }
-
-    [Fact]
-    public void SignPathInstallerFinalizer_RequiresFoundationSignatureAndStrictPayloadVerification()
-    {
-        string finalizer = File.ReadAllText(
-            Path.Combine(RepoRoot, "tools", "finalize-signpath-installer.ps1"));
-
-        Assert.Contains("SignPath installer finalization requires a clean git worktree", finalizer);
-        Assert.Contains("SignPath stable installers must originate from main", finalizer);
-        Assert.Contains("exactly one MSI", finalizer);
-        Assert.Contains("Get-AuthenticodeSignature", finalizer);
-        Assert.Contains("SignPath Foundation", finalizer);
-        Assert.Contains("verify-windows-installer.ps1", finalizer);
-        Assert.Contains("ExpectedInstallerSignatureStatus Valid", finalizer);
-        Assert.Contains("ExpectedPayloadSignatureStatus Valid", finalizer);
-        Assert.Contains("$packagePath.sha256", finalizer);
     }
 
     [Fact]

@@ -129,32 +129,27 @@ public sealed class GitHubAutomationSourceTests
     }
 
     [Fact]
-    public void SignReleaseWorkflow_IsPinnedReadOnlyManualAndCannotPublish()
+    public void UnsignedStableWorkflow_IsPinnedExplicitReadOnlyAndCannotPublish()
     {
-        string workflow = ReadWorkflow("sign-release.yml");
+        string workflow = ReadWorkflow("unsigned-stable-release.yml");
 
         Assert.Contains("workflow_dispatch", workflow);
         Assert.Contains("runs-on: windows-2025", workflow);
-        Assert.Contains("environment: release-signing", workflow);
-        Assert.Contains("actions: read", workflow);
-        Assert.Contains("-KeepStaging", workflow);
-        Assert.Contains("github-artifact-id:", workflow);
-        Assert.Contains("SignPath/github-action-submit-signing-request@b9d91eadd323de506c0c81cf0c7fe7438f3360fd", workflow);
-        Assert.Contains("SIGNPATH_API_TOKEN", workflow);
-        Assert.Contains("SIGNPATH_ORGANIZATION_ID", workflow);
-        Assert.Contains("SIGNPATH_PROJECT_SLUG", workflow);
-        Assert.Contains("SIGNPATH_SIGNING_POLICY_SLUG", workflow);
-        Assert.Contains("SIGNPATH_PAYLOAD_ARTIFACT_CONFIGURATION_SLUG", workflow);
-        Assert.Contains("SIGNPATH_INSTALLER_ARTIFACT_CONFIGURATION_SLUG", workflow);
-        Assert.Contains("artifact-configuration-slug:", workflow);
-        Assert.Contains("upload-installer-input", workflow);
-        Assert.Contains("finalize-signpath-release.ps1", workflow);
-        Assert.Contains("finalize-signpath-installer.ps1", workflow);
-        Assert.Contains("win-x64.msi.sha256", workflow);
+        Assert.Contains("permissions:\n  contents: read", Normalize(workflow));
+        Assert.Contains("Unsigned stable release preparation must run from main", workflow);
+        Assert.Contains("-PublicRelease", workflow);
+        Assert.Contains("-AllowUnsignedPublicRelease", workflow);
+        Assert.Contains("-CertificateThumbprint ''", workflow);
+        Assert.Contains("ExpectedInstallerSignatureStatus NotSigned", workflow);
+        Assert.Contains("ExpectedPayloadSignatureStatus NotSigned", workflow);
+        Assert.Contains("win-x64-unsigned.msi.sha256", workflow);
+        Assert.Contains("Expected Windows publisher: Unknown", workflow);
         Assert.Contains("Published as GitHub Release: no", workflow);
         Assert.DoesNotContain("contents: write", workflow);
         Assert.DoesNotContain("gh release", workflow, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("create-release", workflow, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("SignPath", workflow, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("SIGNPATH_", workflow);
     }
 
     [Fact]
