@@ -47,8 +47,8 @@ public sealed class GitHubAutomationSourceTests
         Assert.Contains("queries: security-extended", workflow);
         Assert.Contains("dotnet clean .\\AirType\\AirType.csproj", workflow);
         Assert.Contains("dotnet build .\\AirType\\AirType.csproj", workflow);
-        Assert.Contains("github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9", workflow);
-        Assert.Contains("github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e9", workflow);
+        Assert.Contains("github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a", workflow);
+        Assert.Contains("github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a", workflow);
         Assert.DoesNotContain("github/codeql-action/autobuild", workflow);
     }
 
