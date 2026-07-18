@@ -23,4 +23,4 @@ tokenizers==0.23.1
 tqdm==4.67.3
 typing-extensions==4.16.0
 urllib3==2.7.0
-websockets==16.0
+websockets==16.1.1
