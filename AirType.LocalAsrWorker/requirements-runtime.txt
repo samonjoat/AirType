@@ -1,5 +1,5 @@
 # Complete, pinned Local ASR runtime closure for CPython 3.12 x64.
-certifi==2026.6.17
+certifi==2026.7.22
 charset-normalizer==3.4.9
 colorama==0.4.6
 ctranslate2==4.8.1
