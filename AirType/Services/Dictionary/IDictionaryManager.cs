@@ -39,7 +39,7 @@ public interface IDictionaryManager
     /// <summary>
     /// Adds a new vocabulary word to the dictionary.
     /// </summary>
-    /// <param name="word">The word to add (e.g., "Shanaz", "NAudio", "Kubernetes").</param>
+    /// <param name="word">The word to add (e.g., "Contoso", "NAudio", "Kubernetes").</param>
     /// <returns>The created entry.</returns>
     /// <exception cref="ArgumentException">If the word is invalid or a duplicate.</exception>
     Task<DictionaryEntry> AddVocabularyWordAsync(string word);
