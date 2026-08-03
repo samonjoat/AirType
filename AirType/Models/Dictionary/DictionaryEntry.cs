@@ -30,7 +30,7 @@ public class DictionaryEntry
 
     /// <summary>
     /// For VocabularyWord entries ONLY: the word to recognize.
-    /// Examples: "Shanaz", "Ikechukwu", "NAudio", "Kubernetes"
+    /// Examples: "Contoso", "NAudio", "Kubernetes"
     /// For CorrectionPair entries: null.
     /// </summary>
     public string? Word { get; set; }
@@ -116,7 +116,7 @@ public enum DictionaryEntryType
 {
     /// <summary>
     /// A vocabulary word the user wants the API to recognize.
-    /// Examples: "Shanaz", "Ikechukwu", "NAudio", "Kubernetes", "gRPC", "INCOSE"
+    /// Examples: "Contoso", "NAudio", "Kubernetes", "gRPC", "INCOSE"
     /// Uses the Word property only. OriginalText and CorrectedText are null.
     /// </summary>
     VocabularyWord,
